@@ -29,7 +29,12 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/import-genie-data.lock"
     fi
     JAVA_IMPORTER_ARGS="$JAVA_PROXY_ARGS $java_debug_args $JAVA_SSL_ARGS -Dspring.profiles.active=dbcp -Djava.io.tmpdir=$tmp -ea -cp $IMPORTER_JAR_FILENAME org.mskcc.cbio.importer.Admin"
     genie_portal_notification_file=$(mktemp $tmp/genie-portal-update-notification.$now.XXXXXX)
-    ONCOTREE_VERSION_TO_USE=oncotree_2018_06_01
+    IMPORTING_GENIE_RELEASE_BEFORE_9_0=0
+    if [ $IMPORTING_GENIE_RELEASE_BEFORE_9_0 != "0" ] ; then
+        oncotree_version_to_use=oncotree_2018_06_01
+    else
+        oncotree_version_to_use=oncotree_2019_12_01
+    fi
     WEB_APPLICATION_SHOULD_BE_RESTARTED=0 # 0 = skip the restart, non-0 = do the restart
     
     echo $now : starting import
@@ -69,9 +74,9 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/import-genie-data.lock"
     if [[ $DB_VERSION_FAIL -eq 0 && $GENIE_FETCH_FAIL -eq 0 && $CDD_ONCOTREE_RECACHE_FAIL -eq 0 ]]; then
         # import genie studies into genie portal
         echo "importing cancer type updates into genie portal database..."
-        $JAVA_BINARY -Xmx16g $JAVA_IMPORTER_ARGS --import-types-of-cancer --oncotree-version ${ONCOTREE_VERSION_TO_USE}
+        $JAVA_BINARY -Xmx16g $JAVA_IMPORTER_ARGS --import-types-of-cancer --oncotree-version ${oncotree_version_to_use}
         echo "importing study data into genie portal database..."
-        $JAVA_BINARY -Xmx64g $JAVA_IMPORTER_ARGS --update-study-data --portal genie-portal --update-worksheet --notification-file "$genie_portal_notification_file" --oncotree-version ${ONCOTREE_VERSION_TO_USE} --transcript-overrides-source mskcc
+        $JAVA_BINARY -Xmx64g $JAVA_IMPORTER_ARGS --update-study-data --portal genie-portal --update-worksheet --notification-file "$genie_portal_notification_file" --oncotree-version ${oncotree_version_to_use} --transcript-overrides-source mskcc
         IMPORT_EXIT_STATUS=$?
         if [ $IMPORT_EXIT_STATUS -ne 0 ]; then
             echo "Genie import failed!"
