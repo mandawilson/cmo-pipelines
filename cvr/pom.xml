@@ -65,9 +65,9 @@
     used in the pipelines importer always matches the version used by the Genome
     Nexus annotation pipeline. -->
     <dependency>
-      <groupId>com.github.genome-nexus</groupId>
+      <groupId>com.github.inodb</groupId>
       <artifactId>genome-nexus-annotation-pipeline</artifactId>
-      <version>3e1c8c8dbca54b6f0d28665dbd7148ff14292b98</version>
+      <version>d10586a84554f201c92a9121f2be1a99aee9890f</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
