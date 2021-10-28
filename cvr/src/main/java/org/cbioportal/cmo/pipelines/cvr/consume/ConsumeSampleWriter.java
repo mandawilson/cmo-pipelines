@@ -41,6 +41,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -114,6 +115,10 @@ public class ConsumeSampleWriter implements ItemStreamWriter<String> {
     private void consumeSample(String sampleId) {
         HttpEntity requestEntity = getRequestEntity();
         RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory requestFactory =
+            (SimpleClientHttpRequestFactory) restTemplate.getRequestFactory();
+        requestFactory.setReadTimeout(10000);
+        requestFactory.setConnectTimeout(10000);
         ResponseEntity<CVRConsumeSample> responseEntity;
         try {
             responseEntity = restTemplate.exchange(dmpConsumeUrl + sampleId, HttpMethod.GET, requestEntity, CVRConsumeSample.class);
@@ -129,6 +134,8 @@ public class ConsumeSampleWriter implements ItemStreamWriter<String> {
                 String message = "Sample "+ sampleId +" consumed succesfully";
                 log.info(message);
             }
+        } catch (org.springframework.web.client.RestClientResponseException e) {
+            log.error("Error consuming sample " + sampleId + " response body is: '" + e.getResponseBodyAsString() + "'");
         } catch (org.springframework.web.client.RestClientException e) {
             log.error("Error consuming sample " + sampleId + "(" + e + ")");
         }
