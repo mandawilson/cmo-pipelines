@@ -52,6 +52,7 @@ export PIPELINES_CONFIG_HOME=$PORTAL_GIT_HOME/pipelines-configuration
 # environment variables for top level data repositories
 #######################
 export BIC_DATA_HOME=$PORTAL_DATA_HOME/bic-mskcc
+export CMO_ARGOS_DATA_HOME="$PORTAL_DATA_HOME/cmo-argos"
 export PDX_DATA_HOME=$PORTAL_DATA_HOME/crdb_pdx
 export PRIVATE_DATA_HOME=$PORTAL_DATA_HOME/private
 export DMP_DATA_HOME=$PORTAL_DATA_HOME/dmp

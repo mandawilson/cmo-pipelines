@@ -14,8 +14,7 @@ import validation_utils
 # ------------------------------------------------------------------------------------------------------------
 OUTPUT_FILE = sys.stderr
 
-# data directory and repo names
-CMO_ROOT_DIRECTORY = "/data/portal-cron/cbio-portal-data/bic-mskcc/"
+# repo names
 DATAHUB_REPO_NAME = "datahub"
 CRDB_FETCH_SOURCE_ID= 'crdb_pdx_raw_data'
 CASE_LISTS_DESTINATION_SUBDIR = "case_lists"
@@ -266,7 +265,7 @@ def resolve_source_study_path(source_id, data_source_directories):
         For cmo studies, the cancer study path may be resolved by splitting the cancer study
         identifier (source id) on the first three underscores.
 
-        Ex: ke_07_83_b --> $CMO_ROOT_DIRECTORY/ke/07/83/b
+        Ex: ke_07_83_b --> /data/portal-cron/cbio-portal-data/bic-mskcc/ke/07/83/b
     """
     source_paths = []
     for data_source_directory in data_source_directories:
