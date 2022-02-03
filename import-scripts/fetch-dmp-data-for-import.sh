@@ -21,7 +21,7 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     IMPORT_STATUS_ARCHER=0
     IMPORT_STATUS_ACCESS=0
 
-    # Flags for ARCHER fusions merge failure
+    # Flags for ARCHER structural variants merge failure
     ARCHER_MERGE_IMPACT_FAIL=0
     ARCHER_MERGE_HEME_FAIL=0
 
@@ -542,32 +542,32 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     # -----------------------------------------------------------------------------------------------------------
     # ADDITIONAL PROCESSING
 
-    # ARCHER fusions into MSKIMPACT, HEMEPACT
+    # ARCHER structural variants into MSKIMPACT, HEMEPACT
     # we maintain a file with the list of ARCHER samples to exclude from any merges/subsets involving
-    # ARCHER data to prevent duplicate fusion events ($MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/mapped_archer_fusion_samples.txt)
-    MAPPED_ARCHER_FUSION_SAMPLES_FILE=$MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/mapped_archer_fusion_samples.txt
+    # ARCHER data to prevent duplicate structural variants events ($MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/mapped_archer_samples.txt)
+    MAPPED_ARCHER_SAMPLES_FILE=$MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/mapped_archer_samples.txt
 
-    # add linked ARCHER_UNFILTERED fusions to MSKIMPACT
+    # add linked ARCHER_UNFILTERED structural variants to MSKIMPACT
     if [ $IMPORT_STATUS_IMPACT -eq 0 ] && [ $FETCH_CVR_ARCHER_FAIL -eq 0 ] && [ $FETCH_CVR_IMPACT_FAIL -eq 0 ] ; then
-        # Merge ARCHER_UNFILTERED fusion data into the MSKIMPACT cohort
-        $PYTHON_BINARY $PORTAL_HOME/scripts/archer_fusions_merger.py --archer-fusions $MSK_ARCHER_UNFILTERED_DATA_HOME/data_fusions.txt --linked-cases-filename $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/linked_cases.txt --fusions-filename $MSK_IMPACT_DATA_HOME/data_fusions.txt --clinical-filename $MSK_IMPACT_DATA_HOME/data_clinical_mskimpact_data_clinical_cvr.txt --mapped-archer-samples-filename $MAPPED_ARCHER_FUSION_SAMPLES_FILE --study-id "mskimpact" --gmail-username $GMAIL_USERNAME --gmail-password $GMAIL_PASSWORD
+        # Merge ARCHER_UNFILTERED structural variant data into the MSKIMPACT cohort
+        $PYTHON_BINARY $PORTAL_HOME/scripts/merge_archer_structural_variants.py --archer-structural-variants $MSK_ARCHER_UNFILTERED_DATA_HOME/data_sv.txt --linked-cases-filename $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/linked_cases.txt --structural-variants-filename $MSK_IMPACT_DATA_HOME/data_sv.txt --clinical-filename $MSK_IMPACT_DATA_HOME/data_clinical_mskimpact_data_clinical_cvr.txt --mapped-archer-samples-filename $MAPPED_ARCHER_SAMPLES_FILE --study-id "mskimpact" --gmail-username $GMAIL_USERNAME --gmail-password $GMAIL_PASSWORD
         if [ $? -gt 0 ] ; then
             ARCHER_MERGE_IMPACT_FAIL=1
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
         else
-            $GIT_BINARY add $MAPPED_ARCHER_FUSION_SAMPLES_FILE $MSK_IMPACT_DATA_HOME ; $GIT_BINARY commit -m "Adding ARCHER_UNFILTERED fusions to MSKIMPACT"
+            $GIT_BINARY add $MAPPED_ARCHER_SAMPLES_FILE $MSK_IMPACT_DATA_HOME ; $GIT_BINARY commit -m "Adding ARCHER_UNFILTERED structural variants to MSKIMPACT"
         fi
     fi
 
-    # add linked ARCHER_UNFILTERED fusions to HEMEPACT
+    # add linked ARCHER_UNFILTERED structural variants to HEMEPACT
     if [ $IMPORT_STATUS_HEME -eq 0 ] && [ $FETCH_CVR_ARCHER_FAIL -eq 0 ] && [ $FETCH_CVR_HEME_FAIL -eq 0 ] ; then
-        # Merge ARCHER_UNFILTERED fusion data into the HEMEPACT cohort
-        $PYTHON_BINARY $PORTAL_HOME/scripts/archer_fusions_merger.py --archer-fusions $MSK_ARCHER_UNFILTERED_DATA_HOME/data_fusions.txt --linked-cases-filename $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/linked_cases.txt --fusions-filename $MSK_HEMEPACT_DATA_HOME/data_fusions.txt --clinical-filename $MSK_HEMEPACT_DATA_HOME/data_clinical_hemepact_data_clinical.txt --mapped-archer-samples-filename $MAPPED_ARCHER_FUSION_SAMPLES_FILE --study-id "mskimpact_heme" --gmail-username $GMAIL_USERNAME --gmail-password $GMAIL_PASSWORD
+        # Merge ARCHER_UNFILTERED structural variant data into the HEMEPACT cohort
+        $PYTHON_BINARY $PORTAL_HOME/scripts/merge_archer_structural_variants.py --archer-structural-variants $MSK_ARCHER_UNFILTERED_DATA_HOME/data_sv.txt --linked-cases-filename $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr/linked_cases.txt --structural-variants-filename $MSK_HEMEPACT_DATA_HOME/data_sv.txt --clinical-filename $MSK_HEMEPACT_DATA_HOME/data_clinical_hemepact_data_clinical.txt --mapped-archer-samples-filename $MAPPED_ARCHER_SAMPLES_FILE --study-id "mskimpact_heme" --gmail-username $GMAIL_USERNAME --gmail-password $GMAIL_PASSWORD
         if [ $? -gt 0 ] ; then
             ARCHER_MERGE_HEME_FAIL=1
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
         else
-            $GIT_BINARY add $MAPPED_ARCHER_FUSION_SAMPLES_FILE $MSK_HEMEPACT_DATA_HOME ; $GIT_BINARY commit -m "Adding ARCHER_UNFILTERED fusions to HEMEPACT"
+            $GIT_BINARY add $MAPPED_ARCHER_SAMPLES_FILE $MSK_HEMEPACT_DATA_HOME ; $GIT_BINARY commit -m "Adding ARCHER_UNFILTERED structural variants to HEMEPACT"
         fi
     fi
 
@@ -814,7 +814,7 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         # process data for UNLINKED_ARCHER
         if [[ $IMPORT_STATUS_ARCHER -eq 0 && $FETCH_CVR_ARCHER_FAIL -eq 0 ]] ; then
             # attempt to subset archer unfiltered w/same excluded archer samples list used for MIXEDPACT, MSKSOLIDHEME
-            $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_ARCHER_DATA_HOME -i mskarcher -m "true" -e $MAPPED_ARCHER_FUSION_SAMPLES_FILE $MSK_ARCHER_UNFILTERED_DATA_HOME
+            $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_ARCHER_DATA_HOME -i mskarcher -m "true" -e $MAPPED_ARCHER_SAMPLES_FILE $MSK_ARCHER_UNFILTERED_DATA_HOME
             if [ $? -gt 0 ] ; then
                 echo "UNLINKED_ARCHER subset failed! Study will not be updated in the portal."
                 sendPreImportFailureMessageMskPipelineLogsSlack "UNLINKED_ARCHER subset"
@@ -853,22 +853,22 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     #   (1) MSK-IMPACT, HEMEPACT, RAINDANCE, ARCHER, and ACCESS (MIXEDPACT)
     #   (1) MSK-IMPACT, HEMEPACT, ARCHER, and ACCESS (MSKSOLIDHEME)
 
-    # touch meta_SV.txt files if not already exist
-    if [ ! -f $MSK_IMPACT_DATA_HOME/meta_SV.txt ] ; then
-        touch $MSK_IMPACT_DATA_HOME/meta_SV.txt
+    # touch meta_sv.txt files if not already exist
+    if [ ! -f $MSK_IMPACT_DATA_HOME/meta_sv.txt ] ; then
+        touch $MSK_IMPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ ! -f $MSK_HEMEPACT_DATA_HOME/meta_SV.txt ] ; then
-        touch $MSK_HEMEPACT_DATA_HOME/meta_SV.txt
+    if [ ! -f $MSK_HEMEPACT_DATA_HOME/meta_sv.txt ] ; then
+        touch $MSK_HEMEPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ ! -f $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_SV.txt ] ; then
-        touch $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_SV.txt
+    if [ ! -f $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_sv.txt ] ; then
+        touch $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_sv.txt
     fi
 
     printTimeStampedDataProcessingStepMessage "merge of MSK-IMPACT, HEMEPACT, RAINDANCE, ARCHER, ACCESS data for MIXEDPACT"
     # MIXEDPACT merge and check exit code
-    $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_MIXEDPACT_DATA_HOME -i mixedpact -m "true" -e $MAPPED_ARCHER_FUSION_SAMPLES_FILE $MSK_IMPACT_DATA_HOME $MSK_HEMEPACT_DATA_HOME $MSK_RAINDANCE_DATA_HOME $MSK_ARCHER_UNFILTERED_DATA_HOME $MSK_ACCESS_DATA_HOME
+    $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_MIXEDPACT_DATA_HOME -i mixedpact -m "true" -e $MAPPED_ARCHER_SAMPLES_FILE $MSK_IMPACT_DATA_HOME $MSK_HEMEPACT_DATA_HOME $MSK_RAINDANCE_DATA_HOME $MSK_ARCHER_UNFILTERED_DATA_HOME $MSK_ACCESS_DATA_HOME
     if [ $? -gt 0 ] ; then
         echo "MIXEDPACT merge failed! Study will not be updated in the portal."
         echo $(date)
@@ -880,7 +880,7 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
 
     printTimeStampedDataProcessingStepMessage "merge of MSK-IMPACT, HEMEPACT, ACCESS data for MSKSOLIDHEME"
     # MSKSOLIDHEME merge and check exit code
-    $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_SOLID_HEME_DATA_HOME -i mskimpact -m "true" -e $MAPPED_ARCHER_FUSION_SAMPLES_FILE $MSK_IMPACT_DATA_HOME $MSK_HEMEPACT_DATA_HOME $MSK_ACCESS_DATA_HOME
+    $PYTHON_BINARY $PORTAL_HOME/scripts/merge.py -d $MSK_SOLID_HEME_DATA_HOME -i mskimpact -m "true" -e $MAPPED_ARCHER_SAMPLES_FILE $MSK_IMPACT_DATA_HOME $MSK_HEMEPACT_DATA_HOME $MSK_ACCESS_DATA_HOME
     if [ $? -gt 0 ] ; then
         echo "MSKSOLIDHEME merge failed! Study will not be updated in the portal."
         echo $(date)
@@ -899,17 +899,17 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         addCancerTypeCaseLists $MSK_SOLID_HEME_DATA_HOME "mskimpact" "data_clinical_sample.txt" "data_clinical_patient.txt"
     fi
 
-    # check that meta_SV.txt are actually empty files before deleting from IMPACT, HEME, and ARCHER studies
-    if [ $(wc -l < $MSK_IMPACT_DATA_HOME/meta_SV.txt) -eq 0 ] ; then
-        rm $MSK_IMPACT_DATA_HOME/meta_SV.txt
+    # check that meta_sv.txt are actually empty files before deleting from IMPACT, HEME, and ARCHER studies
+    if [ $(wc -l < $MSK_IMPACT_DATA_HOME/meta_sv.txt) -eq 0 ] ; then
+        rm $MSK_IMPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ $(wc -l < $MSK_HEMEPACT_DATA_HOME/meta_SV.txt) -eq 0 ] ; then
-        rm $MSK_HEMEPACT_DATA_HOME/meta_SV.txt
+    if [ $(wc -l < $MSK_HEMEPACT_DATA_HOME/meta_sv.txt) -eq 0 ] ; then
+        rm $MSK_HEMEPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ $(wc -l < $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_SV.txt) -eq 0 ] ; then
-        rm $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_SV.txt
+    if [ $(wc -l < $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_sv.txt) -eq 0 ] ; then
+        rm $MSK_ARCHER_UNFILTERED_DATA_HOME/meta_sv.txt
     fi
 
     # commit or revert changes for MIXEDPACT
@@ -1208,13 +1208,13 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     # Create lymphoma "super" cohort
     # Subset MSK-IMPACT and HEMEPACT by Cancer Type
 
-    # first touch meta_SV.txt in mskimpact, hemepact if not already exists - need these to generate merged subsets
-    if [ ! -f $MSK_IMPACT_DATA_HOME/meta_SV.txt ] ; then
-        touch $MSK_IMPACT_DATA_HOME/meta_SV.txt
+    # first touch meta_sv.txt in mskimpact, hemepact if not already exists - need these to generate merged subsets
+    if [ ! -f $MSK_IMPACT_DATA_HOME/meta_sv.txt ] ; then
+        touch $MSK_IMPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ ! -f $MSK_HEMEPACT_DATA_HOME/meta_SV.txt ] ; then
-        touch $MSK_HEMEPACT_DATA_HOME/meta_SV.txt
+    if [ ! -f $MSK_HEMEPACT_DATA_HOME/meta_sv.txt ] ; then
+        touch $MSK_HEMEPACT_DATA_HOME/meta_sv.txt
     fi
 
     # **************************************** ORDER OF SUBSET
@@ -1282,13 +1282,13 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         rm -f $LYMPHOMA_SUPER_COHORT_DATA_HOME/*genie* $LYMPHOMA_SUPER_COHORT_DATA_HOME/seq_date.txt
     fi
 
-    # check that meta_SV.txt is actually an empty file before deleting from IMPACT and HEMEPACT studies
-    if [ $(wc -l < $MSK_IMPACT_DATA_HOME/meta_SV.txt) -eq 0 ] ; then
-        rm $MSK_IMPACT_DATA_HOME/meta_SV.txt
+    # check that meta_sv.txt is actually an empty file before deleting from IMPACT and HEMEPACT studies
+    if [ $(wc -l < $MSK_IMPACT_DATA_HOME/meta_sv.txt) -eq 0 ] ; then
+        rm $MSK_IMPACT_DATA_HOME/meta_sv.txt
     fi
 
-    if [ $(wc -l < $MSK_HEMEPACT_DATA_HOME/meta_SV.txt) -eq 0 ] ; then
-        rm $MSK_HEMEPACT_DATA_HOME/meta_SV.txt
+    if [ $(wc -l < $MSK_HEMEPACT_DATA_HOME/meta_sv.txt) -eq 0 ] ; then
+        rm $MSK_HEMEPACT_DATA_HOME/meta_sv.txt
     fi
 
     # commit or revert changes for Lymphoma super cohort
@@ -1350,16 +1350,16 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         echo -e "$EMAIL_BODY" | mail -s "ACCESS Fetch Failure: Import" $email_list
     fi
 
-    EMAIL_BODY="Failed to merge ARCHER fusion events into MSKIMPACT"
+    EMAIL_BODY="Failed to merge ARCHER structural variant events into MSKIMPACT"
     if [ $ARCHER_MERGE_IMPACT_FAIL -gt 0 ] ; then
         echo -e "Sending email $EMAIL_BODY"
-        echo -e "$EMAIL_BODY" |  mail -s "MSKIMPACT-ARCHER Merge Failure: Study will be updated without new ARCHER fusion events." $PIPELINES_EMAIL_LIST
+        echo -e "$EMAIL_BODY" |  mail -s "MSKIMPACT-ARCHER Merge Failure: Study will be updated without new ARCHER structural variant events." $PIPELINES_EMAIL_LIST
     fi
 
-    EMAIL_BODY="Failed to merge ARCHER fusion events into HEMEPACT"
+    EMAIL_BODY="Failed to merge ARCHER structural variant events into HEMEPACT"
     if [ $ARCHER_MERGE_HEME_FAIL -gt 0 ] ; then
         echo -e "Sending email $EMAIL_BODY"
-        echo -e "$EMAIL_BODY" |  mail -s "HEMEPACT-ARCHER Merge Failure: Study will be updated without new ARCHER fusion events." $PIPELINES_EMAIL_LIST
+        echo -e "$EMAIL_BODY" |  mail -s "HEMEPACT-ARCHER Merge Failure: Study will be updated without new ARCHER structural variant events." $PIPELINES_EMAIL_LIST
     fi
 
     EMAIL_BODY="Failed to subset UNLINKED_ARCHER data from ARCHER_UNFILTERED"

@@ -114,7 +114,6 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
 
     # scripts
     MAF_ANNOTATOR_SCRIPT="$ONCOKB_ANNOTATOR_HOME/MafAnnotator.py"
-    FUSION_ANNOTATOR_SCRIPT="$ONCOKB_ANNOTATOR_HOME/FusionAnnotator.py"
     CNA_ANNOTATOR_SCRIPT="$ONCOKB_ANNOTATOR_HOME/CnaAnnotator.py"
     CLINICAL_ANNOTATOR_SCRIPT="$ONCOKB_ANNOTATOR_HOME/ClinicalDataAnnotator.py"
     PDF_SCRIPT="$ONCOKB_ANNOTATOR_HOME/OncoKBPlots.py"
@@ -132,10 +131,6 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
     ONCOKB_MAF_FILE_ZIPPED="${ONCOKB_MAF_FILE}.gz"
     ONCOKB_PREVIOUS_MAF_FILE="$ONCOKB_OUT_DIR/data_mutations_extended.oncokb.previous.txt"
     ONCOKB_SOMATIC_MAF_FILE="$ONCOKB_OUT_DIR/data_mutations_extended_somatic.oncokb.txt"
-
-    SOURCE_FUSION_FILE="$MSK_SOLID_HEME_DATA_HOME/data_fusions.txt"
-    STAGING_FUSION_FILE="$STAGING_DIR/data_fusions.txt"
-    ONCOKB_FUSION_FILE="$ONCOKB_OUT_DIR/data_fusions.oncokb.txt"
 
     SOURCE_CNA_FILE="$MSK_SOLID_HEME_DATA_HOME/data_CNA.txt"
     STAGING_CNA_FILE="$STAGING_DIR/data_CNA.txt"
@@ -209,7 +204,6 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
         mkdir -p $STAGING_DIR
         mkdir -p $ONCOKB_OUT_DIR
         cp -a $SOURCE_SAMPLE_FILE $STAGING_SAMPLE_FILE
-        cp -a $SOURCE_FUSION_FILE $STAGING_FUSION_FILE
         cp -a $SOURCE_CNA_FILE $STAGING_CNA_FILE
         cp -a $SOURCE_MAF_FILE $STAGING_MAF_FILE # maf is last because it takes the longest to copy
     fi
@@ -242,17 +236,6 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
         fi
     fi
 
-    # Annotating Fusions
-    if [ $ONCOKB_ANNOTATION_SUCCESS -eq 1 ] ; then
-        echo $(date)
-        echo "Beginning fusions annotation..."
-        $PYTHON3_BINARY $FUSION_ANNOTATOR_SCRIPT -b $ONCOKB_TOKEN -i $STAGING_FUSION_FILE -o $ONCOKB_FUSION_FILE -c $STAGING_SAMPLE_FILE
-        if [ $? -ne 0 ] ; then
-            echo "Failed to annotate fusion file, exiting..."
-            ONCOKB_ANNOTATION_SUCCESS=0
-        fi
-    fi
-
     # Annotating CNA
     if [ $ONCOKB_ANNOTATION_SUCCESS -eq 1 ] ; then
         echo $(date)
@@ -268,7 +251,7 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
     if [ $ONCOKB_ANNOTATION_SUCCESS -eq 1 ] ; then
         echo $(date)
         echo "Beginning clinical annotation..."
-        $PYTHON3_BINARY $CLINICAL_ANNOTATOR_SCRIPT -i $STAGING_SAMPLE_FILE -o $ONCOKB_SAMPLE_FILE -a $ONCOKB_MAF_FILE,$ONCOKB_FUSION_FILE,$ONCOKB_CNA_FILE
+        $PYTHON3_BINARY $CLINICAL_ANNOTATOR_SCRIPT -i $STAGING_SAMPLE_FILE -o $ONCOKB_SAMPLE_FILE -a $ONCOKB_MAF_FILE,$ONCOKB_CNA_FILE
         if [ $? -ne 0 ] ; then
             echo "Failed to annotate clinical file, exiting..."
             ONCOKB_ANNOTATION_SUCCESS=0
@@ -292,7 +275,7 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
         echo "Beginning somatic clinical annotation..."
         # Generate somatic-only MAF by excluding lines including 'GERMLINE'
         awk -F'\t' '$26 != "GERMLINE"' $ONCOKB_MAF_FILE > $ONCOKB_SOMATIC_MAF_FILE
-        $PYTHON3_BINARY $CLINICAL_ANNOTATOR_SCRIPT -i $STAGING_SAMPLE_FILE -o $ONCOKB_SOMATIC_SAMPLE_FILE -a $ONCOKB_SOMATIC_MAF_FILE,$ONCOKB_FUSION_FILE,$ONCOKB_CNA_FILE
+        $PYTHON3_BINARY $CLINICAL_ANNOTATOR_SCRIPT -i $STAGING_SAMPLE_FILE -o $ONCOKB_SOMATIC_SAMPLE_FILE -a $ONCOKB_SOMATIC_MAF_FILE,$ONCOKB_CNA_FILE
         if [ $? -ne 0 ] ; then
             echo "Failed to annotate somatic clinical file, exiting..."
             ONCOKB_ANNOTATION_SUCCESS=0
@@ -343,7 +326,6 @@ FLOCK_FILEPATH="/data/portal-cron/cron-lock/oncokb-annotator.sh"
 
     # Cleanup copied staging files if they exist
     rm -f $STAGING_SAMPLE_FILE
-    rm -f $STAGING_FUSION_FILE
     rm -f $STAGING_CNA_FILE
     rm -f $STAGING_MAF_FILE
 

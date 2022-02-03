@@ -48,7 +48,7 @@ CASE_LIST_DATATYPE = 'CASE_LIST'
 # FOR ORGANIZING DATA FILES BY DATATYPE
 GENETIC_ALTERATION_TYPES = {
     'PROFILE':['COPY_NUMBER_ALTERATION', 'PROTEIN_LEVEL', 'MRNA_EXPRESSION', 'METHYLATION'],
-    'NORMAL':['MUTATION_EXTENDED', 'FUSION', 'CLINICAL'],
+    'NORMAL':['MUTATION_EXTENDED', 'SV', 'CLINICAL'],
     'CASE_INDEPENDENT':['MUTSIG', 'GISTIC_GENES_AMP', 'GISTIC_GENES_DEL']
 }
 
@@ -299,7 +299,7 @@ def remove_normal_samples_from_data_file(new_data_filename, properties):
     data_file = open(properties['data_filename'], 'rU')
     new_data_file = open(new_data_filename, 'w')
 
-    # remove normal sample records by row if 'NORMAL' or 'SEG' datatype (i.e., MAF, Fusions) or by column if 'PROFILE' data type
+    # remove normal sample records by row if 'NORMAL' or 'SEG' datatype (i.e., MAF, Structural Variants) or by column if 'PROFILE' data type
     if properties['genetic_alteration_type'] in GENETIC_ALTERATION_TYPES['NORMAL'] or properties['datatype'] == SEG_DATATYPE:
         header_added = False
         for line in data_file.readlines():
@@ -397,11 +397,13 @@ def load_samples_from_data_file(study_directory, properties):
                 case_id_column = 'SAMPLE_ID'
         elif 'Tumor_Sample_Barcode' in header:
             case_id_column = 'Tumor_Sample_Barcode'
+        elif 'SampleId' in header:
+            case_id_column = 'SampleId'
         elif properties['datatype'] == SEG_DATATYPE:
             case_id_column = 'ID'
         else:
             print >> ERROR_FILE, 'load_samples_from_data_file(), ERROR: Do not know how to extract samples from file:', properties['data_filename']
-            print >> ERROR_FILE, 'load_samples_from_data_file(), ERROR: File does not contain key column for clinical files (PATIENT_ID and/or SAMPLE_ID) or mutation/fusion file (Tumor_Sample_Barcode)'
+            print >> ERROR_FILE, 'load_samples_from_data_file(), ERROR: File does not contain key column for clinical files (PATIENT_ID and/or SAMPLE_ID) or mutation file (Tumor_Sample_Barcode) or structural variant file (SampleId)'
             sys.exit(2)
         data_file = open(properties['data_filename'], 'rU')
         data_reader = [l for l in data_file.readlines() if not l.startswith('#')][1:]

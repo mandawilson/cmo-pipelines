@@ -1,0 +1,6 @@
+SampleId	Annotation	Breakpoint_Type	Comments	Confidence_Class	Conn_Type	Connection_Type	Event_Info	Mapq	Normal_Read_Count	Normal_Variant_Count	Paired_End_Read_Support	Site1_Chrom	Site1_Desc	Site1_Gene	Site1_Pos	Site2_Chrom	Site2_Desc	Site2_Gene	Site2_Pos	Split_Read_Support	Sv_Class_Name	Sv_Desc	Sv_Length	Sv_VariantId	Tumor_Read_Count	Tumor_Variant_Count	Variant_Status_Name	Sv_Status
+P-DMP-P001-T01-IM5							NTRK1-LMNA fusion							LMNA				NTRK1										
+P-DMP-P001-T03-IM6							NTRK1-LMNA fusion							LMNA				NTRK1										
+P-DMP-P001-T03-IM6							AXIN1-intragenic							AXIN1														
+P-DMP-P001-T04-IM6							NTRK1-LMNA fusion							LMNA				NTRK1										
+P-DMP-P001-T02-IM6							AXIN1-intragenic							AXIN1														

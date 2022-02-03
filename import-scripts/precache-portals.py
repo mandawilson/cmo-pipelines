@@ -85,8 +85,8 @@ def get_cancer_studies(cbio_url, authorization_header):
         cancer_study_ids.append(study["studyId"])
     return cancer_study_ids
 
-def cache_fusion_genes(cbio_url, post_body, authorization_header):
-    requests.post("%s/api/fusion-genes/fetch" % (cbio_url), headers = authorization_header, json = post_body)
+def cache_structural_variant_genes(cbio_url, post_body, authorization_header):
+    requests.post("%s/api/structuralvariant-genes/fetch" % (cbio_url), headers = authorization_header, json = post_body)
 
 def cache_mutated_genes(cbio_url, post_body, authorization_header):
     requests.post("%s/api/mutated-genes/fetch" % (cbio_url), headers = authorization_header,  json = post_body)
@@ -106,7 +106,7 @@ def construct_sample_list_post_body(cbio_url, cancer_study, authorization_header
 
 def precache_slow_endpoints(cbio_url, post_body, authorization_header):
     pool = Pool(5)
-    pool.apply_async(cache_fusion_genes, [cbio_url, post_body, authorization_header])
+    pool.apply_async(cache_structural_variant_genes, [cbio_url, post_body, authorization_header])
     pool.apply_async(cache_mutated_genes, [cbio_url, post_body, authorization_header])
     pool.apply_async(cache_cna_genes, [cbio_url, post_body, authorization_header])
 # ----------------------------------------------------------

@@ -42,9 +42,6 @@ LOG2_META_PATTERN = 'meta_log2CNA.txt'
 EXPRESSION_FILE_PATTERN = 'data_expression.txt'
 EXPRESSION_META_PATTERN = 'meta_expression.txt'
 
-FUSION_FILE_PATTERN = 'data_fusions.txt'
-FUSION_META_PATTERN = 'meta_fusions.txt'
-
 METHYLATION450_FILE_PATTERN = 'data_methylation_hm450.txt'
 METHYLATION450_META_PATTERN = 'meta_methylation_hm450.txt'
 
@@ -81,11 +78,8 @@ CLINICAL_SAMPLE_META_PATTERN = 'meta_clinical_sample.txt'
 GENE_MATRIX_FILE_PATTERN = 'data_gene_matrix.txt'
 GENE_MATRIX_META_PATTERN = 'meta_gene_matrix.txt'
 
-SV_FILE_PATTERN = 'data_SV.txt'
-SV_META_PATTERN = 'meta_SV.txt'
-
-FUSIONS_GML_FILE_PATTERN = 'data_fusions_gml.txt'
-FUSIONS_GML_META_PATTERN = 'meta_fusions_gml.txt'
+SV_FILE_PATTERN = 'data_sv.txt'
+SV_META_PATTERN = 'meta_sv.txt'
 
 # we do not want to copy over or merge json files or meta_study.txt files
 FILE_PATTERN_FILTERS = ['.sqlite', '.json', 'meta_study.txt', '.orig', '.merge', 'ignore', 'data_gene_panel']
@@ -106,7 +100,6 @@ NON_CASE_IDS = [
 
 # only files fitting patterns placed in these two lists will be merged
 NORMAL_MERGE_PATTERNS = [MUTATION_META_PATTERN,
-    FUSION_META_PATTERN,
     SEG_HG18_META_PATTERN,
     SEG_HG19_META_PATTERN,
     CLINICAL_META_PATTERN,
@@ -114,8 +107,7 @@ NORMAL_MERGE_PATTERNS = [MUTATION_META_PATTERN,
     CLINICAL_SAMPLE_META_PATTERN,
     GENE_MATRIX_META_PATTERN,
     SV_META_PATTERN,
-    TIMELINE_META_PATTERN,
-    FUSIONS_GML_META_PATTERN]
+    TIMELINE_META_PATTERN]
 
 PROFILE_MERGE_PATTERNS = [CNA_META_PATTERN,
     LOG2_META_PATTERN,
@@ -141,7 +133,6 @@ META_FILE_MAP = {MUTATION_META_PATTERN:(MUTATION_FILE_PATTERN, 'mutations'),
     METHYLATION_PROMOTERS_HMEPIC_META_PATTERN:(METHYLATION_PROMOTERS_HMEPIC_FILE_PATTERN, 'methylation_promoters_hmEPIC'),
     METHYLATION_GB_WGBS_META_PATTERN:(METHYLATION_GB_WGBS_FILE_PATTERN, 'methylation_genebodies_wgbs'),
     METHYLATION_PROMOTERS_WGBS_META_PATTERN:(METHYLATION_PROMOTERS_WGBS_FILE_PATTERN, 'methylation_promoters_wgbs'),
-    FUSION_META_PATTERN:(FUSION_FILE_PATTERN, 'mutations'),
     RPPA_META_PATTERN:(RPPA_FILE_PATTERN, 'rppa'),
     EXPRESSION_META_PATTERN:(EXPRESSION_FILE_PATTERN, 'expression'),
     RNASEQ_EXPRESSION_META_PATTERN:(RNASEQ_EXPRESSION_FILE_PATTERN,'RNA_Seq_expression_median'),
@@ -150,8 +141,7 @@ META_FILE_MAP = {MUTATION_META_PATTERN:(MUTATION_FILE_PATTERN, 'mutations'),
     CLINICAL_SAMPLE_META_PATTERN:(CLINICAL_SAMPLE_FILE_PATTERN, 'clinical_sample'),
     GENE_MATRIX_META_PATTERN:(GENE_MATRIX_FILE_PATTERN, 'gene_matrix'),
     SV_META_PATTERN:(SV_FILE_PATTERN, 'structural_variant'),
-    TIMELINE_META_PATTERN:(TIMELINE_FILE_PATTERN, 'timeline'),
-    FUSIONS_GML_META_PATTERN:(FUSIONS_GML_FILE_PATTERN, 'fusions_gml')}
+    TIMELINE_META_PATTERN:(TIMELINE_FILE_PATTERN, 'timeline')}
 
 MUTATION_FILE_PREFIX = 'data_mutations'
 NONSIGNEDOUT_MUTATION_FILENAME = 'data_nonsignedout_mutations.txt'
@@ -726,8 +716,6 @@ def organize_files(studies, file_types, merge_clinical):
                 file_types[MUTATION_META_PATTERN].append(study_file)
             elif CNA_META_PATTERN in study_file:
                 file_types[CNA_META_PATTERN].append(study_file)
-            elif FUSION_META_PATTERN in study_file:
-                file_types[FUSION_META_PATTERN].append(study_file)
             elif SEG_HG18_META_PATTERN in study_file:
                 file_types[SEG_HG18_META_PATTERN].append(study_file)
             elif SEG_HG19_META_PATTERN in study_file:
@@ -758,15 +746,11 @@ def organize_files(studies, file_types, merge_clinical):
                 file_types[SV_META_PATTERN].append(study_file)
             elif TIMELINE_META_PATTERN in study_file:
                 file_types[TIMELINE_META_PATTERN].append(study_file)
-            elif FUSIONS_GML_META_PATTERN in study_file:
-                file_types[FUSIONS_GML_META_PATTERN].append(study_file)
             # FILE PATTERN MATCHING
             elif MUTATION_FILE_PATTERN in study_file:
                 file_types[MUTATION_FILE_PATTERN].append(study_file)
             elif CNA_FILE_PATTERN in study_file:
                 file_types[CNA_FILE_PATTERN].append(study_file)
-            elif FUSION_FILE_PATTERN in study_file:
-                file_types[FUSION_FILE_PATTERN].append(study_file)
             elif SEG_HG18_FILE_PATTERN in study_file:
                 file_types[SEG_HG18_FILE_PATTERN].append(study_file)
             elif SEG_HG19_FILE_PATTERN in study_file:
@@ -797,8 +781,6 @@ def organize_files(studies, file_types, merge_clinical):
                 file_types[SV_FILE_PATTERN].append(study_file)
             elif TIMELINE_FILE_PATTERN in study_file:
                 file_types[TIMELINE_FILE_PATTERN].append(study_file)
-            elif FUSIONS_GML_FILE_PATTERN in study_file:
-                file_types[FUSIONS_GML_FILE_PATTERN].append(study_file)
             # CLINICAL FILE PATTERN MATCHING
             elif CLINICAL_META_PATTERN in study_file:
                 file_types[CLINICAL_META_PATTERN].append(study_file)
@@ -866,7 +848,6 @@ def main():
 
     file_types = {MUTATION_FILE_PATTERN: [],
         CNA_FILE_PATTERN: [],
-        FUSION_FILE_PATTERN: [],
         SEG_HG18_FILE_PATTERN: [],
         SEG_HG19_FILE_PATTERN: [],
         LOG2_FILE_PATTERN: [],
@@ -882,10 +863,8 @@ def main():
         GENE_MATRIX_FILE_PATTERN: [],
         SV_FILE_PATTERN: [],
         TIMELINE_FILE_PATTERN: [],
-        FUSIONS_GML_FILE_PATTERN: [],
         MUTATION_META_PATTERN: [],
         CNA_META_PATTERN: [],
-        FUSION_META_PATTERN: [],
         SEG_HG18_META_PATTERN: [],
         SEG_HG19_META_PATTERN: [],
         LOG2_META_PATTERN: [],
@@ -901,7 +880,6 @@ def main():
         GENE_MATRIX_META_PATTERN: [],
         SV_META_PATTERN: [],
         TIMELINE_META_PATTERN: [],
-        FUSIONS_GML_META_PATTERN: [],
         SUPP_DATA: [],
         CLINICAL_META_PATTERN: [],
         CLINICAL_PATIENT_META_PATTERN: [],

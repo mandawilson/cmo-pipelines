@@ -1,0 +1,8 @@
+cancer_study_identifier: test_fake_dmp_study
+genetic_alteration_type: STRUCTURAL_VARIANT
+datatype: SV
+stable_id: mskimpact_structural_variants
+profile_name: Sv
+profile_description: Structural variants from IMPACT, HEME, ARCHER.
+show_profile_in_analysis_tab: false
+data_filename: data_sv.txt
