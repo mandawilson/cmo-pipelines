@@ -54,7 +54,7 @@ def is_valid_study_sample_id(sample_id, study_id):
 
 def get_sv_event_key(data):
 	""" Returns a 'key' used for identifying structural variant events. """
-	return (data['SampleId'].strip(), data['Event_Info'].strip(), data['Site1_Gene'].strip(), data['Site2_Gene'].strip())
+	return (data['SampleId'].strip(), data['EventInfo'].strip(), data['Site1HugoSymbol'].strip(), data['Site2HugoSymbol'].strip())
 
 def load_linked_archer_cases(linked_archer_cases_filename, study_id):
 	""" Get the mapping between archer -> impact/heme samples """
