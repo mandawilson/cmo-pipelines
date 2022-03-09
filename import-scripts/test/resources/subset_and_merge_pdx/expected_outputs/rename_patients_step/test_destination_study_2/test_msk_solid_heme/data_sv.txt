@@ -1,6 +1,6 @@
-SampleId	Annotation	Breakpoint_Type	Comments	Confidence_Class	Conn_Type	Connection_Type	Event_Info	Mapq	Normal_Read_Count	Normal_Variant_Count	Paired_End_Read_Support	Site1_Chrom	Site1_Desc	Site1_Gene	Site1_Pos	Site2_Chrom	Site2_Desc	Site2_Gene	Site2_Pos	Split_Read_Support	Sv_Class_Name	Sv_Desc	Sv_Length	Sv_VariantId	Tumor_Read_Count	Tumor_Variant_Count	Variant_Status_Name	Sv_Status
-P-DMP-P001-T01-IM5							NTRK1-LMNA fusion							LMNA				NTRK1										
-P-DMP-P001-T03-IM6							NTRK1-LMNA fusion							LMNA				NTRK1										
-P-DMP-P001-T03-IM6							AXIN1-intragenic							AXIN1														
-P-DMP-P001-T04-IM6							NTRK1-LMNA fusion							LMNA				NTRK1										
-P-DMP-P001-T02-IM6							AXIN1-intragenic							AXIN1														
+SampleId	SvStatus	Site1HugoSymbol	Site2HugoSymbol	Site1EnsemblTranscriptId	Site2EnsemblTranscriptId	Site1EntrezGeneId	Site2EntrezGeneId	Site1RegionNumber	Site2RegionNumber	Site1Region	Site2Region	Site1Chromosome	Site2Chromosome	Site1Contig	Site2Contig	Site1Position	Site2Position	Site1Description	Site2Description	Site2EffectOnFrame	NcbiBuild	SvClass	TumorSplitReadCount	TumorPairedEndReadCount	EventInfo	BreakpointType	ConnectionType	Annotation	Breakpoint_Type	DnaSupport	RnaSupport	SvLength	NormalReadCount	TumorReadCount	NormalVariantCount	TumorVariantCount	NormalPairedEndReadCount	NormalSplitEndReadCount	Comments
+P-DMP-P001-T01-IM5		LMNA	NTRK1																						NTRK1-LMNA fusion														
+P-DMP-P001-T03-IM6		LMNA	NTRK1																						NTRK1-LMNA fusion														
+P-DMP-P001-T03-IM6		AXIN1																							AXIN1-intragenic														
+P-DMP-P001-T04-IM6		LMNA	NTRK1																						NTRK1-LMNA fusion														
+P-DMP-P001-T02-IM6		AXIN1																							AXIN1-intragenic														
