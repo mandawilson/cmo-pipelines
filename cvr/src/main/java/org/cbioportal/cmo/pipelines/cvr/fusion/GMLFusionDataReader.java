@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2018 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -64,8 +64,8 @@ public class GMLFusionDataReader implements ItemStreamReader<CVRFusionRecord> {
     @Autowired
     public CVRUtilities cvrUtilities;
 
-    @Value("#{jobParameters[stagingDirectory]}")
-    private String stagingDirectory;
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
 
     private Set<String> gmlFusionsSeen = new HashSet<>();
     private List<CVRFusionRecord> gmlFusionRecords = new ArrayList<>();
@@ -87,7 +87,7 @@ public class GMLFusionDataReader implements ItemStreamReader<CVRFusionRecord> {
     private void processJsonFile() {
         GMLData gmlData = new GMLData();
         // load gml cvr data from cvr_gml_data.json file
-        File cvrGmlFile =  new File(stagingDirectory, CVRUtilities.GML_FILE);
+        File cvrGmlFile =  new File(privateDirectory, CVRUtilities.GML_FILE);
         try {
             gmlData = cvrUtilities.readGMLJson(cvrGmlFile);
         } catch (IOException ex) {
@@ -119,7 +119,7 @@ public class GMLFusionDataReader implements ItemStreamReader<CVRFusionRecord> {
     }
 
     private void processGmlFusionsFile() {
-        File gmlFusionsFile = new File(stagingDirectory, CVRUtilities.FUSION_GML_FILE);
+        File gmlFusionsFile = new File(privateDirectory, CVRUtilities.FUSION_GML_FILE);
         if (!gmlFusionsFile.exists()) {
             LOG.info("File does not exist - skipping data loading from germline fusions file: " + gmlFusionsFile.getName());
             return;

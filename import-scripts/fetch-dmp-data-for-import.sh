@@ -201,10 +201,11 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         # fetch new/updated IMPACT samples using CVR Web service   (must come after git fetching)
         waitOutDmpTumorServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR fetch for mskimpact"
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_IMPACT_DATA_HOME -n data_clinical_mskimpact_data_clinical_cvr.txt -i mskimpact -r 150 $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_IMPACT_DATA_HOME -p $MSK_IMPACT_PRIVATE_DATA_HOME -n data_clinical_mskimpact_data_clinical_cvr.txt -i mskimpact -r 150 $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR fetch failed!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT CVR Fetch"
             IMPORT_STATUS_IMPACT=1
         else
@@ -213,20 +214,23 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
             if [ $? -gt 0 ] ; then
                 echo "Empty allele count sanity check failed! MSK-IMPACT will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
                 sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT empty allele count sanity check"
                 IMPORT_STATUS_IMPACT=1
             else
                 # check for PHI
-                $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_DATA_HOME/cvr_data.json
+                $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json
                 if [ $? -gt 0 ] ; then
-                    echo "PHI attributes found in $MSK_IMPACT_DATA_HOME/cvr_data.json! MSK-IMPACT will not be imported!"
+                    echo "PHI attributes found in $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json! MSK-IMPACT will not be imported!"
                     cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                    sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_DATA_HOME/cvr_data.json"
+                    cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                    sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json"
                     IMPORT_STATUS_IMPACT=1
                 else
                     FETCH_CVR_IMPACT_FAIL=0
                     echo "committing cvr data"
                     cd $MSK_IMPACT_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest MSKIMPACT Dataset: CVR"
+                    cd $MSK_IMPACT_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest MSKIMPACT Dataset: CVR"
                 fi
                 # identify samples that need to be requeued or removed from data set due to CVR Part A or Part C consent status changes
                 waitOutDmpTumorServerInstabilityPeriod
@@ -238,10 +242,11 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         # fetch new/updated IMPACT germline samples using CVR Web service   (must come after normal cvr fetching)
         waitOutDmpGermlineServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR germline fetch for mskimpact"
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_IMPACT_DATA_HOME -n data_clinical_mskimpact_data_clinical_cvr.txt -g -i mskimpact $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_IMPACT_DATA_HOME -p $MSK_IMPACT_PRIVATE_DATA_HOME -n data_clinical_mskimpact_data_clinical_cvr.txt -g -i mskimpact $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR Germline fetch failed!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT CVR Germline Fetch"
             IMPORT_STATUS_IMPACT=1
             #override the success of the tumor sample cvr fetch with a failed status
@@ -252,6 +257,7 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
             if [ $? -gt 0 ] ; then
                 echo "PHI attributes found in $MSK_IMPACT_DATA_HOME/cvr_gml_data.json! MSK-IMPACT will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
                 sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_DATA_HOME/cvr_gml_data.json"
                 IMPORT_STATUS_IMPACT=1
                 #override the success of the tumor sample cvr fetch with a failed status
@@ -259,6 +265,7 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
             else
                 echo "committing CVR germline data"
                 cd $MSK_IMPACT_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest MSKIMPACT Dataset: CVR Germline"
+                cd $MSK_IMPACT_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest MSKIMPACT Dataset: CVR Germline"
             fi
         fi
     fi
@@ -320,51 +327,57 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         # fetch new/updated heme samples using CVR Web service (must come after git fetching). Threshold is set to 50 since heme contains only 190 samples (07/12/2017)
         waitOutDmpTumorServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR fetch for hemepact"
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_HEMEPACT_DATA_HOME -n data_clinical_hemepact_data_clinical.txt -i mskimpact_heme -r 50 $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_HEMEPACT_DATA_HOME -p $MSK_HEMEPACT_PRIVATE_DATA_HOME -n data_clinical_hemepact_data_clinical.txt -i mskimpact_heme -r 50 $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR heme fetch failed!"
             echo "This will not affect importing of mskimpact"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT CVR Fetch"
             IMPORT_STATUS_HEME=1
         else
             # check for PHI
-            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_DATA_HOME/cvr_data.json
+            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json
             if [ $? -gt 0 ] ; then
-                echo "PHI attributes found in $MSK_HEMEPACT_DATA_HOME/cvr_data.json! HEMEPACT will not be imported!"
+                echo "PHI attributes found in $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json! HEMEPACT will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_DATA_HOME/cvr_data.json"
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json"
                 IMPORT_STATUS_HEME=1
             else
                 FETCH_CVR_HEME_FAIL=0
                 echo "committing cvr data for heme"
                 cd $MSK_HEMEPACT_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest HEMEPACT dataset"
+                cd $MSK_HEMEPACT_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest HEMEPACT dataset"
             fi
         fi
         # fetch new/updated HEMEPACT germline samples using CVR Web service   (must come after normal cvr fetching)
         waitOutDmpGermlineServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR germline fetch for hemepact"
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_HEMEPACT_DATA_HOME -n data_clinical_hemepact_data_clinical.txt -g -i mskimpact_heme $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_HEMEPACT_DATA_HOME -p $MSK_HEMEPACT_PRIVATE_DATA_HOME -n data_clinical_hemepact_data_clinical.txt -g -i mskimpact_heme $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR Germline fetch failed!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT CVR Germline Fetch"
             IMPORT_STATUS_HEME=1
             #override the success of the tumor sample cvr fetch with a failed status
             FETCH_CVR_HEME_FAIL=1
         else
             # check for PHI
-            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_DATA_HOME/cvr_gml_data.json
+            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_gml_data.json
             if [ $? -gt 0 ] ; then
-                echo "PHI attributes found in $MSK_HEMEPACT_DATA_HOME/cvr_gml_data.json! HEMEPACT will not be imported!"
+                echo "PHI attributes found in $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_gml_data.json! HEMEPACT will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_DATA_HOME/cvr_gml_data.json"
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_gml_data.json"
                 IMPORT_STATUS_HEME=1
                 #override the success of the tumor sample cvr fetch with a failed status
                 FETCH_CVR_HEME_FAIL=1
             else
                 echo "committing CVR germline data"
                 cd $MSK_HEMEPACT_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest HEMEPACT Dataset: CVR Germline"
+                cd $MSK_HEMEPACT_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest HEMEPACT Dataset: CVR Germline"
             fi
         fi
     fi
@@ -397,24 +410,27 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         waitOutDmpTumorServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR fetch for archer"
         # archer has -b option to block warnings for samples with zero variants (all samples will have zero variants)
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_ARCHER_UNFILTERED_DATA_HOME -n data_clinical_mskarcher_data_clinical.txt -i mskarcher -s -b -r 50 $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_ARCHER_UNFILTERED_DATA_HOME -p $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME -n data_clinical_mskarcher_data_clinical.txt -i mskarcher -s -b -r 50 $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR Archer fetch failed!"
             echo "This will not affect importing of mskimpact"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "ARCHER_UNFILTERED CVR Fetch"
             IMPORT_STATUS_ARCHER=1
         else
             # check for PHI
-            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json
+            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json
             if [ $? -gt 0 ] ; then
-                echo "PHI attributes found in $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json! UNLINKED_ARCHER will not be imported!"
+                echo "PHI attributes found in $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json! UNLINKED_ARCHER will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                sendPreImportFailureMessageMskPipelineLogsSlack "ARCHER PHI attributes scan failed on $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json"
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                sendPreImportFailureMessageMskPipelineLogsSlack "ARCHER PHI attributes scan failed on $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json"
                 IMPORT_STATUS_ARCHER=1
             else
                 FETCH_CVR_ARCHER_FAIL=0
                 cd $MSK_ARCHER_UNFILTERED_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest ARCHER_UNFILTERED dataset"
+                cd $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest ARCHER_UNFILTERED dataset"
             fi
         fi
     fi
@@ -447,24 +463,27 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         waitOutDmpTumorServerInstabilityPeriod
         printTimeStampedDataProcessingStepMessage "CVR fetch for access"
         # access has -b option to block warnings for samples with zero variants (all samples will have zero variants)
-        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_ACCESS_DATA_HOME -n data_clinical_mskaccess_data_clinical.txt -i mskaccess -s -b -r 50 $CVR_TEST_MODE_ARGS
+        $JAVA_BINARY $JAVA_CVR_FETCHER_ARGS -d $MSK_ACCESS_DATA_HOME -p $MSK_ACCESS_PRIVATE_DATA_HOME -n data_clinical_mskaccess_data_clinical.txt -i mskaccess -s -b -r 50 $CVR_TEST_MODE_ARGS
         if [ $? -gt 0 ] ; then
             echo "CVR ACCESS fetch failed!"
             echo "This will not affect importing of mskimpact"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+            cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
             sendPreImportFailureMessageMskPipelineLogsSlack "ACCESS CVR Fetch"
             IMPORT_STATUS_ACCESS=1
         else
             # check for PHI
-            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ACCESS_DATA_HOME/cvr_data.json
+            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json
             if [ $? -gt 0 ] ; then
-                echo "PHI attributes found in $MSK_ACCESS_DATA_HOME/cvr_data.json! ACCESS will not be imported!"
+                echo "PHI attributes found in $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json! ACCESS will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                sendPreImportFailureMessageMskPipelineLogsSlack "ACCESS PHI attributes scan failed on $MSK_ACCESS_DATA_HOME/cvr_data.json"
+                cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY reset HEAD --hard
+                sendPreImportFailureMessageMskPipelineLogsSlack "ACCESS PHI attributes scan failed on $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json"
                 IMPORT_STATUS_ACCESS=1
             else
                 FETCH_CVR_ACCESS_FAIL=0
                 cd $MSK_ACCESS_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest ACCESS dataset"
+                cd $MSK_ACCESS_PRIVATE_DATA_HOME ; $GIT_BINARY add ./* ; $GIT_BINARY commit -m "Latest ACCESS dataset"
             fi
         fi
     fi

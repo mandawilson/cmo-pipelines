@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2017 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -51,6 +51,9 @@ public class CVRVariantsWriter implements ItemStreamWriter<String> {
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
 
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
+
     @Autowired
     public CVRUtilities cvrUtilities;
 
@@ -60,7 +63,7 @@ public class CVRVariantsWriter implements ItemStreamWriter<String> {
     // Set up the writer and print the json from CVR to a file
     @Override
     public void open(ExecutionContext ec) throws ItemStreamException {
-        this.stagingFile = new File(stagingDirectory, cvrUtilities.CVR_FILE);
+        this.stagingFile = new File(privateDirectory, cvrUtilities.CVR_FILE);
         PassThroughLineAggregator aggr = new PassThroughLineAggregator();
         flatFileItemWriter.setLineAggregator(aggr);
         flatFileItemWriter.setResource(new FileSystemResource(stagingFile));

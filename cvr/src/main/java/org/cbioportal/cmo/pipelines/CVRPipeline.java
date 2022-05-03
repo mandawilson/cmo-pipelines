@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2018 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -60,6 +60,7 @@ public class CVRPipeline {
         Options options = new Options();
         options.addOption("h", "help", false, "shows this help document and quits.")
             .addOption("d", "directory", true, "The staging directory")
+            .addOption("p", "private_directory", true, "The JSON directory")
             .addOption("j", "json", false, "To read or not to read. This can be used alone or in combination with --gml")
             .addOption("g", "gml", false, "Run germline job")
             .addOption("s", "skipSeg", false, "Flag to skip fetching seg data")
@@ -79,7 +80,7 @@ public class CVRPipeline {
         System.exit(exitStatus);
     }
 
-    private static void launchCvrPipelineJob(String[] args, String directory, String studyId, Boolean json, Boolean gml,
+    private static void launchCvrPipelineJob(String[] args, String directory, String privateDirectory, String studyId, Boolean json, Boolean gml,
             Boolean skipSeg, boolean testingMode, Integer maxNumSamplesToRemove, Boolean forceAnnotation, String clinicalFilename,
             Boolean stopZeroVariantWarnings) throws Exception {
         // log wether in testing mode or not
@@ -98,6 +99,7 @@ public class CVRPipeline {
         String jobName;
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addString("stagingDirectory", directory)
+                .addString("privateDirectory", privateDirectory)
                 .addString("studyId", studyId)
                 .addString("testingMode", String.valueOf(testingMode))
                 .addString("maxNumSamplesToRemove", String.valueOf(maxNumSamplesToRemove))
@@ -185,7 +187,7 @@ public class CVRPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine = parser.parse(options, args);
         if (commandLine.hasOption("h") ||
-                ((!commandLine.hasOption("d") || !commandLine.hasOption("i")) && !commandLine.hasOption("c"))) {
+                ((!commandLine.hasOption("d") || !commandLine.hasOption("p") || !commandLine.hasOption("i")) && !commandLine.hasOption("c"))) {
             help(options, 0);
         }
         if (commandLine.hasOption("c")) {
@@ -214,7 +216,7 @@ public class CVRPipeline {
             if (commandLine.hasOption("n")) {
                 clinicalFilename = commandLine.getOptionValue("n");
             }
-            launchCvrPipelineJob(args, commandLine.getOptionValue("d"), commandLine.getOptionValue("i"),
+            launchCvrPipelineJob(args, commandLine.getOptionValue("d"), commandLine.getOptionValue("p"), commandLine.getOptionValue("i"),
                 commandLine.hasOption("j"), commandLine.hasOption("g"), commandLine.hasOption("s"),
                 commandLine.hasOption("t"), maxNumSamplesToRemove, commandLine.hasOption("f"), clinicalFilename, commandLine.hasOption("b"));
         }

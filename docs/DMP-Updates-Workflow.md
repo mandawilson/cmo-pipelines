@@ -317,11 +317,11 @@ if [ $IMPORT_STATUS_IMPACT -eq 0 ] ; then
             IMPORT_STATUS_IMPACT=1
         else
             # check for PHI
-            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_DATA_HOME/cvr_data.json
+            $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json
             if [ $? -gt 0 ] ; then
-                echo "PHI attributes found in $MSK_IMPACT_DATA_HOME/cvr_data.json! MSK-IMPACT will not be imported!"
+                echo "PHI attributes found in $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json! MSK-IMPACT will not be imported!"
                 cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-                sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_DATA_HOME/cvr_data.json"
+                sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json"
                 IMPORT_STATUS_IMPACT=1
             else
                 FETCH_CVR_IMPACT_FAIL=0
@@ -343,7 +343,7 @@ if [ $IMPORT_STATUS_IMPACT -eq 0 ] ; then
 *Modified files*
 * CVR clinical and genomic (somatic) files:
     * `$MSK_IMPACT_DATA_HOME/data_clinical_mskimpact_data_clinical_cvr.txt`
-    * `$MSK_IMPACT_DATA_HOME/cvr_data.json`
+    * `$MSK_IMPACT_PRIVATE_DATA_HOME/cvr_data.json`
     * `$MSK_IMPACT_DATA_HOME/data_CNA.txt`
     * `$MSK_IMPACT_DATA_HOME/data_SV.txt`
     * `$MSK_IMPACT_DATA_HOME/data_fusions.txt`
@@ -397,11 +397,11 @@ if [ $IMPORT_STATUS_IMPACT -eq 0 ] ; then
         FETCH_CVR_IMPACT_FAIL=1
     else
         # check for PHI
-        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_DATA_HOME/cvr_gml_data.json
+        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_gml_data.json
         if [ $? -gt 0 ] ; then
-            echo "PHI attributes found in $MSK_IMPACT_DATA_HOME/cvr_gml_data.json! MSK-IMPACT will not be imported!"
+            echo "PHI attributes found in $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_gml_data.json! MSK-IMPACT will not be imported!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-            sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_DATA_HOME/cvr_gml_data.json"
+            sendPreImportFailureMessageMskPipelineLogsSlack "MSKIMPACT PHI attributes scan failed on $MSK_IMPACT_PRIVATE_DATA_HOME/cvr_gml_data.json"
             IMPORT_STATUS_IMPACT=1
             #override the success of the tumor sample cvr fetch with a failed status
             FETCH_CVR_IMPACT_FAIL=1
@@ -422,7 +422,7 @@ fi
 *Modified files*
 * CVR clinical and genomic (germline) files:
     * `$MSK_IMPACT_DATA_HOME/data_clinical_mskimpact_data_clinical_cvr.txt`
-    * `$MSK_IMPACT_DATA_HOME/cvr_gml_data.json`
+    * `$MSK_IMPACT_PRIVATE_DATA_HOME/cvr_gml_data.json`
     * `$MSK_IMPACT_DATA_HOME/data_fusions_gml.txt`
     * `$MSK_IMPACT_DATA_HOME/data_mutations_extended.txt`
 
@@ -618,11 +618,11 @@ if [ $IMPORT_STATUS_HEME -eq 0 ] ; then
         IMPORT_STATUS_HEME=1
     else
         # check for PHI
-        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_DATA_HOME/cvr_data.json
+        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json
         if [ $? -gt 0 ] ; then
-            echo "PHI attributes found in $MSK_HEMEPACT_DATA_HOME/cvr_data.json! HEMEPACT will not be imported!"
+            echo "PHI attributes found in $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json! HEMEPACT will not be imported!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-            sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_DATA_HOME/cvr_data.json"
+            sendPreImportFailureMessageMskPipelineLogsSlack "HEMEPACT PHI attributes scan failed on $MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json"
             IMPORT_STATUS_HEME=1
         else
             FETCH_CVR_HEME_FAIL=0
@@ -641,7 +641,7 @@ fi
 
 *Modified files*
 * CVR clinical and genomic (somatic) files:
-    * `$MSK_HEMEPACT_DATA_HOME/cvr_data.json`
+    * `$MSK_HEMEPACT_PRIVATE_DATA_HOME/cvr_data.json`
     * `$MSK_HEMEPACT_DATA_HOME/data_CNA.txt`
     * `$MSK_HEMEPACT_DATA_HOME/data_SV.txt`
     * `$MSK_HEMEPACT_DATA_HOME/data_fusions.txt`
@@ -757,11 +757,11 @@ if [ $IMPORT_STATUS_RAINDANCE -eq 0 ] ; then
         IMPORT_STATUS_RAINDANCE=1
     else
         # check for PHI
-        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_RAINDANCE_DATA_HOME/cvr_data.json
+        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_RAINDANCE_PRIVATE_DATA_HOME/cvr_data.json
         if [ $? -gt 0 ] ; then
-            echo "PHI attributes found in $MSK_RAINDANCE_DATA_HOME/cvr_data.json! RAINDANCE will not be imported!"
+            echo "PHI attributes found in $MSK_RAINDANCE_PRIVATE_DATA_HOME/cvr_data.json! RAINDANCE will not be imported!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-            sendPreImportFailureMessageMskPipelineLogsSlack "RAINDANCE PHI attributes scan failed on $MSK_RAINDANCE_DATA_HOME/cvr_data.json"
+            sendPreImportFailureMessageMskPipelineLogsSlack "RAINDANCE PHI attributes scan failed on $MSK_RAINDANCE_PRIVATE_DATA_HOME/cvr_data.json"
             IMPORT_STATUS_RAINDANCE=1
         else
             FETCH_CVR_RAINDANCE_FAIL=0
@@ -779,7 +779,7 @@ fi
 
 *Modified files*
 * CVR clinical and genomic (somatic) files:
-    * `$MSK_RAINDANCE_DATA_HOME/cvr_data.json`
+    * `$MSK_RAINDANCE_PRIVATE_DATA_HOME/cvr_data.json`
     * `$MSK_RAINDANCE_DATA_HOME/data_gene_matrix.txt`
     * `$MSK_RAINDANCE_DATA_HOME/data_mutations_extended.txt`
     * `$MSK_RAINDANCE_DATA_HOME/data_nonsignedout_mutations.txt`
@@ -888,11 +888,11 @@ if [ $IMPORT_STATUS_ARCHER -eq 0 ] ; then
         IMPORT_STATUS_ARCHER=1
     else
         # check for PHI
-        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json
+        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json
         if [ $? -gt 0 ] ; then
-            echo "PHI attributes found in $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json! UNLINKED_ARCHER will not be imported!"
+            echo "PHI attributes found in $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json! UNLINKED_ARCHER will not be imported!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-            sendPreImportFailureMessageMskPipelineLogsSlack "ARCHER PHI attributes scan failed on $MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json"
+            sendPreImportFailureMessageMskPipelineLogsSlack "ARCHER PHI attributes scan failed on $MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json"
             IMPORT_STATUS_ARCHER=1
         else
             FETCH_CVR_ARCHER_FAIL=0
@@ -910,7 +910,7 @@ fi
 
 *Modified files*
 * CVR clinical and genomic (somatic) files:
-    * `$MSK_ARCHER_UNFILTERED_DATA_HOME/cvr_data.json`
+    * `$MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME/cvr_data.json`
     * `$MSK_ARCHER_UNFILTERED_DATA_HOME/data_fusions.txt`
     * `$MSK_ARCHER_UNFILTERED_DATA_HOME/data_SV.txt`
     * `$MSK_ARCHER_UNFILTERED_DATA_HOME/data_gene_matrix.txt`
@@ -1017,11 +1017,11 @@ if [ $IMPORT_STATUS_ACCESS -eq 0 ] ; then
         IMPORT_STATUS_ACCESS=1
     else
         # check for PHI
-        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ACCESS_DATA_HOME/cvr_data.json
+        $PYTHON_BINARY $PORTAL_HOME/scripts/phi-scanner.py -a $PIPELINES_CONFIG_HOME/properties/fetch-cvr/phi-scanner-attributes.txt -j $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json
         if [ $? -gt 0 ] ; then
-            echo "PHI attributes found in $MSK_ACCESS_DATA_HOME/cvr_data.json! ACCESS will not be imported!"
+            echo "PHI attributes found in $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json! ACCESS will not be imported!"
             cd $DMP_DATA_HOME ; $GIT_BINARY reset HEAD --hard
-            sendPreImportFailureMessageMskPipelineLogsSlack "ACCESS PHI attributes scan failed on $MSK_ACCESS_DATA_HOME/cvr_data.json"
+            sendPreImportFailureMessageMskPipelineLogsSlack "ACCESS PHI attributes scan failed on $MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json"
             IMPORT_STATUS_ACCESS=1
         else
             FETCH_CVR_ACCESS_FAIL=0
@@ -1039,7 +1039,7 @@ fi
 
 *Modified files*
 * CVR clinical and genomic (somatic) files:
-    * `$MSK_ACCESS_DATA_HOME/cvr_data.json`
+    * `$MSK_ACCESS_PRIVATE_DATA_HOME/cvr_data.json`
     * `$MSK_ACCESS_DATA_HOME/data_CNA.txt`
     * `$MSK_ACCESS_DATA_HOME/data_SV.txt`
     * `$MSK_ACCESS_DATA_HOME/data_fusions.txt`

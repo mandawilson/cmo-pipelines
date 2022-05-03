@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2017 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -61,6 +61,9 @@ public class CVRClinicalDataReader implements ItemStreamReader<CVRClinicalRecord
 
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
+
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
 
     @Value("#{jobParameters[studyId]}")
     private String studyId;
@@ -169,7 +172,7 @@ public class CVRClinicalDataReader implements ItemStreamReader<CVRClinicalRecord
     private void processJsonFile() {
         CVRData cvrData = new CVRData();
         // load cvr data from cvr_data.json file
-        File cvrFile = new File(stagingDirectory, CVRUtilities.CVR_FILE);
+        File cvrFile = new File(privateDirectory, CVRUtilities.CVR_FILE);
         try {
             cvrData = cvrUtilities.readJson(cvrFile);
         } catch (IOException e) {
