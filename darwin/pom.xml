@@ -78,10 +78,11 @@
       <artifactId>guava</artifactId>
       <version>19.0</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.ibm.db2.jcc/db2jcc -->
     <dependency>
-      <groupId>com.ibm.db2</groupId>
-      <artifactId>db2jcc4</artifactId>
-      <version>4.19.26</version>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc</artifactId>
+      <version>db2jcc4</version>
     </dependency>
     <dependency>
       <groupId>org.mskcc.cmo.ks.redcap.source</groupId>
