@@ -1328,15 +1328,31 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     cd $DMP_DATA_HOME ; $GIT_BINARY push origin
     if [ $? -gt 0 ] ; then
         GIT_PUSH_FAIL=1
-        sendPreImportFailureMessageMskPipelineLogsSlack "GIT PUSH :fire: - address ASAP!"
+        sendPreImportFailureMessageMskPipelineLogsSlack "GIT PUSH (dmp) :fire: - address ASAP!"
+    fi
+
+    printTimeStampedDataProcessingStepMessage "push of dmp private data updates to git repository"
+    # check updated data back into git
+    GIT_PUSH_PRIVATE_FAIL=0
+    cd $DMP_PRIVATE_DATA_HOME ; $GIT_BINARY push origin
+    if [ $? -gt 0 ] ; then
+        GIT_PUSH_PRIVATE_FAIL=1
+        sendPreImportFailureMessageMskPipelineLogsSlack "GIT PUSH (dmp-private) :fire: - address ASAP!"
     fi
 
     #--------------------------------------------------------------
     # Emails for failed processes
 
-    EMAIL_BODY="Failed to push outgoing changes to Git - address ASAP!"
+    EMAIL_BODY="Failed to push dmp outgoing changes to Git - address ASAP!"
     # send email if failed to push outgoing changes to git
     if [ $GIT_PUSH_FAIL -gt 0 ] ; then
+        echo -e "Sending email $EMAIL_BODY"
+        echo -e "$EMAIL_BODY" | mail -s "[URGENT] GIT PUSH FAILURE" $PIPELINES_EMAIL_LIST
+    fi
+
+    EMAIL_BODY="Failed to push dmp-private outgoing changes to Git - address ASAP!"
+    # send email if failed to push outgoing changes to git
+    if [ $GIT_PUSH_PRIVATE_FAIL -gt 0 ] ; then
         echo -e "Sending email $EMAIL_BODY"
         echo -e "$EMAIL_BODY" | mail -s "[URGENT] GIT PUSH FAILURE" $PIPELINES_EMAIL_LIST
     fi
