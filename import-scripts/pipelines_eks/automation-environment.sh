@@ -40,6 +40,14 @@ export START_TRIAGE_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/triage-i
 export KILL_TRIAGE_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/triage-import-kill-request
 export TRIAGE_IMPORT_IN_PROGRESS_FILENAME=$PORTAL_HOME/import-trigger/triage-import-in-progress
 export TRIAGE_IMPORT_KILLING_FILENAME=$PORTAL_HOME/import-trigger/triage-import-killing
+export START_HGNC_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/hgnc-import-start-request
+export KILL_HGNC_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/hgnc-import-kill-request
+export HGNC_IMPORT_IN_PROGRESS_FILENAME=$PORTAL_HOME/import-trigger/hgnc-import-in-progress
+export HGNC_IMPORT_KILLING_FILENAME=$PORTAL_HOME/import-trigger/hgnc-import-killing
+export START_DEVDB_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/devdb-import-start-request
+export KILL_DEVDB_IMPORT_TRIGGER_FILENAME=$PORTAL_HOME/import-trigger/devdb-import-kill-request
+export DEVDB_IMPORT_IN_PROGRESS_FILENAME=$PORTAL_HOME/import-trigger/devdb-import-in-progress
+export DEVDB_IMPORT_KILLING_FILENAME=$PORTAL_HOME/import-trigger/devdb-import-killing
 export PUBLIC_CLUSTER_KUBECONFIG=$PORTAL_HOME/pipelines-credentials/public-cluster-config
 
 #######################
@@ -50,17 +58,18 @@ export JAVA_SSL_ARGS="-Djavax.net.ssl.trustStore=$AWS_SSL_TRUSTSTORE -Djavax.net
 #######################
 # environment variables for configuration / properties files
 #######################
-export PORTAL_CONFIG_HOME=$PORTAL_DATA_HOME/portal-configuration
+export PORTAL_CONFIG_HOME=$PORTAL_GIT_HOME/portal-configuration
 export PIPELINES_CONFIG_HOME=$PORTAL_GIT_HOME/pipelines-configuration
 
 #######################
 # environment variables for top level data repositories
 #######################
-export BIC_DATA_HOME=$PORTAL_DATA_HOME/bic-mskcc
+export BIC_LEGACY_DATA_HOME=$PORTAL_DATA_HOME/bic-mskcc-legacy
 export CMO_ARGOS_DATA_HOME="$PORTAL_DATA_HOME/cmo-argos"
 export PDX_DATA_HOME=$PORTAL_DATA_HOME/crdb_pdx
 export PRIVATE_DATA_HOME=$PORTAL_DATA_HOME/private
 export DMP_DATA_HOME=$PORTAL_DATA_HOME/dmp
+export DMP_PRIVATE_DATA_HOME=$PORTAL_DATA_HOME/dmp-private
 export FOUNDATION_DATA_HOME=$PORTAL_DATA_HOME/foundation
 export IMPACT_DATA_HOME=$PORTAL_DATA_HOME/impact
 export DATAHUB_DATA_HOME=$PORTAL_DATA_HOME/datahub/public
@@ -101,6 +110,12 @@ export MSK_HEMEPACT_DATA_HOME=$DMP_DATA_HOME/mskimpact_heme
 export MSK_ARCHER_DATA_HOME=$DMP_DATA_HOME/mskarcher
 export MSK_ARCHER_UNFILTERED_DATA_HOME=$DMP_DATA_HOME/mskarcher_unfiltered
 export MSK_ACCESS_DATA_HOME=$DMP_DATA_HOME/mskaccess
+export MSK_IMPACT_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskimpact_private
+export MSK_RAINDANCE_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskraindance_private
+export MSK_HEMEPACT_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskimpact_heme_private
+export MSK_ARCHER_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskarcher_private
+export MSK_ARCHER_UNFILTERED_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskarcher_unfiltered_private
+export MSK_ACCESS_PRIVATE_DATA_HOME=$DMP_PRIVATE_DATA_HOME/mskaccess_private
 export MSK_MIXEDPACT_DATA_HOME=$DMP_DATA_HOME/mixedpact
 export MSK_SOLID_HEME_DATA_HOME=$DMP_DATA_HOME/msk_solid_heme
 export MSK_KINGS_DATA_HOME=$DMP_DATA_HOME/msk_kingscounty

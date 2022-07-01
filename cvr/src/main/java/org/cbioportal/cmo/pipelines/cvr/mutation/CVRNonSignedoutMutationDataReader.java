@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2019 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -57,6 +57,9 @@ public class CVRNonSignedoutMutationDataReader implements ItemStreamReader<Annot
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
 
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
+
     @Value("#{jobParameters[forceAnnotation]}")
     private boolean forceAnnotation;
 
@@ -86,7 +89,7 @@ public class CVRNonSignedoutMutationDataReader implements ItemStreamReader<Annot
         this.summaryStatistics = new AnnotationSummaryStatistics(annotator);
         CVRData cvrData = new CVRData();
         // load cvr data from cvr_data.json file
-        File cvrFile = new File(stagingDirectory, CVRUtilities.CVR_FILE);
+        File cvrFile = new File(privateDirectory, CVRUtilities.CVR_FILE);
         try {
             cvrData = cvrUtilities.readJson(cvrFile);
         } catch (IOException e) {

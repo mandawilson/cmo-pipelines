@@ -167,6 +167,40 @@ public class DDPUtils {
     }
 
     /**
+     * Given two date strings, find the number of days that has elapsed between the two
+     * Order of dates does not matter
+     * Option to anonymize the interval (<18 or >90 years) if the output is used for sensitive fields
+     *
+     * @param date1
+     * @param date2
+     * @param anonymizeIntervalInDays
+     * @return
+     * @throws ParseException
+     */
+    public static String resolveIntervalInDays(String date1, String date2, Boolean anonymizeIntervalInDays) throws ParseException {
+        if (Strings.isNullOrEmpty(date1) || Strings.isNullOrEmpty(date2)) {
+            return "NA";
+        }
+        Long intervalInDays = Math.abs(getDateInDays(date1) - getDateInDays(date2));
+        if (anonymizeIntervalInDays) {
+            return anonymizeNumberOfDays(intervalInDays);
+        }
+        return intervalInDays.toString();
+    }
+
+    /**
+     * Defaults function to not anonymize output if no argument is provided
+     *
+     * @param date1
+     * @param date2
+     * @return
+     * @throws ParseException
+     */
+    public static String resolveIntervalInDays(String date1, String date2) throws ParseException {
+        return resolveIntervalInDays(date1, date2, false);
+    }
+
+    /**
      * Resolve and anonymize patient age at diagnosis.
      *
      * If birth year is null/empty then return anonymized patient age.
@@ -200,6 +234,21 @@ public class DDPUtils {
             age = 18;
         }
         return String.valueOf(age);
+    }
+
+    /**
+     * Returns anonymized number of days as string.
+     *
+     * @param numberOfDays
+     * @return
+     */
+    private static String anonymizeNumberOfDays(Long numberOfDays) {
+        if (numberOfDays >= (90 * DAYS_TO_YEARS_CONVERSION)) {
+            return String.valueOf(Math.round(90 * DAYS_TO_YEARS_CONVERSION));
+        } else if (numberOfDays <= (18 * DAYS_TO_YEARS_CONVERSION)) {
+            return String.valueOf(Math.round((18 * DAYS_TO_YEARS_CONVERSION)));
+        }
+        return String.valueOf(numberOfDays);
     }
 
     /**

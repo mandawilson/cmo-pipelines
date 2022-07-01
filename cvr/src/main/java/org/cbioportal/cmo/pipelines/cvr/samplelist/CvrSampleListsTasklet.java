@@ -55,6 +55,9 @@ public class CvrSampleListsTasklet implements Tasklet {
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
 
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
+
     @Value("#{jobParameters[maxNumSamplesToRemove]}")
     private Integer maxNumSamplesToRemove;
 
@@ -122,7 +125,7 @@ public class CvrSampleListsTasklet implements Tasklet {
         log.info("Loading new DMP GML patient IDs from: " + CVRUtilities.GML_FILE);
         GMLData gmlData = new GMLData();
         // load cvr data from cvr_gml_data.json file
-        File cvrGmlFile = new File(stagingDirectory, CVRUtilities.GML_FILE);
+        File cvrGmlFile = new File(privateDirectory, CVRUtilities.GML_FILE);
         try {
             gmlData = cvrUtilities.readGMLJson(cvrGmlFile);
         } catch (IOException e) {
@@ -140,7 +143,7 @@ public class CvrSampleListsTasklet implements Tasklet {
         log.info("Loading new DMP sample IDs from: " + CVRUtilities.CVR_FILE);
         CVRData cvrData = new CVRData();
         // load cvr data from cvr_data.json file
-        File cvrFile = new File(stagingDirectory, CVRUtilities.CVR_FILE);
+        File cvrFile = new File(privateDirectory, CVRUtilities.CVR_FILE);
         try {
             cvrData = cvrUtilities.readJson(cvrFile);
         } catch (IOException e) {

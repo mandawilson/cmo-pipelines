@@ -48,8 +48,8 @@ import org.springframework.core.io.*;
  */
 public class GMLVariantsWriter implements ItemStreamWriter<String> {
 
-    @Value("#{jobParameters[stagingDirectory]}")
-    private String stagingDirectory;
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
 
     @Autowired
     public CVRUtilities cvrUtilities;
@@ -58,7 +58,7 @@ public class GMLVariantsWriter implements ItemStreamWriter<String> {
 
     @Override
     public void open(ExecutionContext ec) throws ItemStreamException {
-        File stagingFile = new File(stagingDirectory, cvrUtilities.GML_FILE);
+        File stagingFile = new File(privateDirectory, cvrUtilities.GML_FILE);
         PassThroughLineAggregator aggr = new PassThroughLineAggregator();
         flatFileItemWriter.setLineAggregator(aggr);
         flatFileItemWriter.setResource(new FileSystemResource(stagingFile));

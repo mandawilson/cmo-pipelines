@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2017 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -58,6 +58,9 @@ public class GMLMutationDataReader implements ItemStreamReader<AnnotatedRecord> 
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
 
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
+
     @Value("#{jobParameters[forceAnnotation]}")
     private boolean forceAnnotation;
 
@@ -88,7 +91,7 @@ public class GMLMutationDataReader implements ItemStreamReader<AnnotatedRecord> 
         this.summaryStatistics = new AnnotationSummaryStatistics(annotator);
         GMLData gmlData = new GMLData();
         // load gml cvr data from cvr_gml_data.json file
-        File cvrGmlFile =  new File(stagingDirectory, CVRUtilities.GML_FILE);
+        File cvrGmlFile =  new File(privateDirectory, CVRUtilities.GML_FILE);
         try {
             gmlData = cvrUtilities.readGMLJson(cvrGmlFile);
         } catch (IOException e) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2017 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2016 - 2022 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -41,12 +41,10 @@ import org.cbioportal.cmo.pipelines.cvr.model.composite.CompositeClinicalRecord;
 import org.cbioportal.cmo.pipelines.cvr.model.staging.CVRSvRecord;
 import org.cbioportal.cmo.pipelines.cvr.model.staging.CVRSegRecord;
 import org.cbioportal.cmo.pipelines.cvr.model.staging.CVRGenePanelRecord;
-import org.cbioportal.cmo.pipelines.cvr.model.staging.CVRFusionRecord;
 import org.cbioportal.cmo.pipelines.cvr.model.staging.CVRClinicalRecord;
 import org.cbioportal.cmo.pipelines.cvr.clinical.*;
 import org.cbioportal.cmo.pipelines.cvr.cna.*;
 import org.cbioportal.cmo.pipelines.cvr.consume.*;
-import org.cbioportal.cmo.pipelines.cvr.fusion.*;
 import org.cbioportal.cmo.pipelines.cvr.genepanel.*;
 import org.cbioportal.cmo.pipelines.cvr.linkedimpactcase.*;
 import org.cbioportal.cmo.pipelines.cvr.samplelist.CvrSampleListsTasklet;
@@ -62,6 +60,8 @@ import org.cbioportal.models.*;
 import java.util.*;
 import javax.sql.DataSource;
 import org.apache.log4j.Logger;
+import org.cbioportal.cmo.pipelines.cvr.smile.SmilePublisherTasklet;
+import org.mskcc.cmo.messaging.Gateway;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -87,7 +87,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 @EnableBatchProcessing
-@ComponentScan(basePackages="org.cbioportal.annotator")
+@ComponentScan(basePackages = {"org.cbioportal.annotator", "org.mskcc.cmo.messaging", "org.mskcc.cmo.common.*"})
 public class BatchConfiguration {
     public static final String CVR_JOB = "cvrJob";
     public static final String JSON_JOB = "jsonJob";
@@ -107,6 +107,15 @@ public class BatchConfiguration {
 
     private final Logger log = Logger.getLogger(BatchConfiguration.class);
 
+    @Autowired
+    private Gateway messagingGateway;
+
+    @Bean
+    public Gateway messagingGateway() throws Exception {
+        messagingGateway.connect();
+        return messagingGateway;
+    }
+
     @Bean
     public CVRUtilities cvrUtilities() {
         return new CVRUtilities();
@@ -119,7 +128,7 @@ public class BatchConfiguration {
                 .next(gmlJsonStep())
                 .next(gmlClinicalStep())
                 .next(gmlMutationStep())
-                .next(gmlFusionStep())
+                .next(gmlSvStep())
                 .build();
     }
 
@@ -148,7 +157,7 @@ public class BatchConfiguration {
                 .start(cvrSampleListsStep())
                 .next(gmlClinicalStep())
                 .next(gmlMutationStep())
-                .next(gmlFusionStep())
+                .next(gmlSvStep())
                 .build();
     }
 
@@ -156,6 +165,7 @@ public class BatchConfiguration {
     public Job consumeSamplesJob() {
         return jobBuilderFactory.get(CONSUME_SAMPLES_JOB)
                 .start(consumeSampleStep())
+                .next(smilePublisherStep())
                 .build();
     }
 
@@ -167,7 +177,7 @@ public class BatchConfiguration {
                 .next(clinicalStep())
                 .next(mutationsStepFlow())
                 .next(cnaStepFlow())
-                .next(svFusionsStepFlow())
+                .next(svStepFlow())
                 .next(genePanelStep())
                 .build();
     }
@@ -181,7 +191,7 @@ public class BatchConfiguration {
                 .next(clinicalStep())
                 .next(mutationsStepFlow())
                 .next(cnaStepFlow())
-                .next(svFusionsStepFlow())
+                .next(svStepFlow())
                 .next(segmentStepFlow())
                 .next(genePanelStep())
                 .next(cvrRequeueStep())
@@ -222,13 +232,12 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Flow svFusionsStepFlow() {
-        return new FlowBuilder<Flow>("svFusionsStepFlow")
-                .start(svFusionsStepExecutionDecider())
+    public Flow svStepFlow() {
+        return new FlowBuilder<Flow>("svStepFlow")
+                .start(svStepExecutionDecider())
                     .on("RUN")
                         .to(svStep())
-                        .next(fusionStep())
-                .from(svFusionsStepExecutionDecider())
+                .from(svStepExecutionDecider())
                     .on("SKIP")
                         .end()
                 .build();
@@ -293,12 +302,12 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Step gmlFusionStep() {
-        return stepBuilderFactory.get("gmlFusionStep")
-                .<CVRFusionRecord, String> chunk(chunkInterval)
-                .reader(gmlFusionDataReader())
-                .processor(fusionDataProcessor())
-                .writer(fusionDataWriter())
+    public Step gmlSvStep() {
+        return stepBuilderFactory.get("gmlSvStep")
+                .<CVRSvRecord, CompositeSvRecord> chunk(chunkInterval)
+                .reader(gmlSvDataReader())
+                .processor(svDataProcessor())
+                .writer(svDataWriter())
                 .build();
     }
 
@@ -373,16 +382,6 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Step fusionStep() {
-        return stepBuilderFactory.get("fusionStep")
-                .<CVRFusionRecord, String> chunk(chunkInterval)
-                .reader(fusionDataReader())
-                .processor(fusionDataProcessor())
-                .writer(fusionDataWriter())
-                .build();
-    }
-
-    @Bean
     public Step segStep() {
         return stepBuilderFactory.get("segStep")
                 .<CVRSegRecord, CompositeSegRecord> chunk(chunkInterval)
@@ -406,6 +405,13 @@ public class BatchConfiguration {
         return stepBuilderFactory.get("cvrRequeueStep")
                 .listener(cvrRequeueListener())
                 .tasklet(cvrRequeueTasklet())
+                .build();
+    }
+
+    @Bean
+    public Step smilePublisherStep() {
+        return stepBuilderFactory.get("smilePublisherStep")
+                .tasklet(smilePublisherTasklet())
                 .build();
     }
 
@@ -603,26 +609,8 @@ public class BatchConfiguration {
 
     @Bean
     @StepScope
-    public ItemStreamReader<CVRFusionRecord> fusionDataReader() {
-        return new CVRFusionDataReader();
-    }
-
-    @Bean
-    @StepScope
-    public ItemStreamReader<CVRFusionRecord> gmlFusionDataReader() {
-        return new GMLFusionDataReader();
-    }
-
-    @Bean
-    @StepScope
-    public CVRFusionDataProcessor fusionDataProcessor() {
-        return new CVRFusionDataProcessor();
-    }
-
-    @Bean
-    @StepScope
-    public ItemStreamWriter<String> fusionDataWriter() {
-        return new CVRFusionDataWriter();
+    public ItemStreamReader<CVRSvRecord> gmlSvDataReader() {
+        return new GMLSvDataReader();
     }
 
     // Reader to read json file generated by step1
@@ -696,6 +684,12 @@ public class BatchConfiguration {
     @StepScope
     public ItemStreamWriter<String> consumeSampleWriter() {
         return new ConsumeSampleWriter();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet smilePublisherTasklet() {
+        return new SmilePublisherTasklet();
     }
 
     @Bean
@@ -776,8 +770,8 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public JobExecutionDecider svFusionsStepExecutionDecider() {
-        return decideStepExecutionByDatatypeForStudyId("sv-fusions");
+    public JobExecutionDecider svStepExecutionDecider() {
+        return decideStepExecutionByDatatypeForStudyId("sv");
     }
 
     @Bean

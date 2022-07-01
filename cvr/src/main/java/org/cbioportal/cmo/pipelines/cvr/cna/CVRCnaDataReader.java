@@ -53,6 +53,9 @@ public class CVRCnaDataReader implements ItemStreamReader<CompositeCnaRecord>{
     @Value("#{jobParameters[stagingDirectory]}")
     private String stagingDirectory;
 
+    @Value("#{jobParameters[privateDirectory]}")
+    private String privateDirectory;
+
     @Autowired
     public CVRUtilities cvrUtilities;
 
@@ -72,7 +75,7 @@ public class CVRCnaDataReader implements ItemStreamReader<CompositeCnaRecord>{
     public void open(ExecutionContext ec) throws ItemStreamException {
         CVRData cvrData = new CVRData();
         // load cvr data from cvr_data.json file
-        File cvrFile = new File(stagingDirectory, cvrUtilities.CVR_FILE);
+        File cvrFile = new File(privateDirectory, cvrUtilities.CVR_FILE);
         try {
             cvrData = cvrUtilities.readJson(cvrFile);
         } catch (IOException e) {

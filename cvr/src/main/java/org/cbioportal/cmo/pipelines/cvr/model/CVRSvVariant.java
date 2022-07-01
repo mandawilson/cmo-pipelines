@@ -63,10 +63,12 @@ import javax.annotation.Generated;
     "paired_end_read_support",
     "site1_chrom",
     "site1_desc",
+    "site1_exon",
     "site1_gene",
     "site1_pos",
     "site2_chrom",
     "site2_desc",
+    "site2_exon",
     "site2_gene",
     "site2_pos",
     "split_read_support",
@@ -110,6 +112,8 @@ public class CVRSvVariant {
     private String site1Chrom;
     @JsonProperty("site1_desc")
     private String site1Desc;
+    @JsonProperty("site1_exon")
+    private String site1Exon;
     @JsonProperty("site1_gene")
     private String site1Gene;
     @JsonProperty("site1_pos")
@@ -118,6 +122,8 @@ public class CVRSvVariant {
     private String site2Chrom;
     @JsonProperty("site2_desc")
     private String site2Desc;
+    @JsonProperty("site2_exon")
+    private String site2Exon;
     @JsonProperty("site2_gene")
     private String site2Gene;
     @JsonProperty("site2_pos")
@@ -134,10 +140,10 @@ public class CVRSvVariant {
     private String svVariantId;
     @JsonProperty("tumor_read_count")
     private String tumorReadCount;
-    @JsonProperty("tumor_variant_count")
-    private String tumorVariantCount;
     @JsonProperty("variant_status_name")
     private String variantStatusName;
+    @JsonProperty("tumor_variant_count")
+    private String tumorVariantCount;
     @JsonProperty("gene1")
     private String gene1;
     @JsonProperty("gene2")
@@ -159,36 +165,43 @@ public class CVRSvVariant {
     }
 
     /**
-    *
-    * @param pairedEndReadSupport
-    * @param site1Pos
-    * @param svLength
-    * @param eventInfo
-    * @param site2Desc
-    * @param svVariantId
-    * @param splitReadSupport
-    * @param normalReadCount
-    * @param svClassName
-    * @param breakpointType
-    * @param site2Pos
-    * @param normalVariantCount
-    * @param tumorVariantCount
-    * @param tumorReadCount
-    * @param confidenceClass
-    * @param site1Chrom
-    * @param connectionType
-    * @param site1Gene
-    * @param svDesc
-    * @param connType
-    * @param mapq
-    * @param variantStatusName
-    * @param site1Desc
-    * @param comments
-    * @param site2Chrom
-    * @param site2Gene
-    * @param annotation
-    */
-    public CVRSvVariant(String annotation, String breakpointType, String comments, String confidenceClass, String connType, String connectionType, String eventInfo, String mapq, String normalReadCount, String normalVariantCount, String pairedEndReadSupport, String site1Chrom, String site1Desc, String site1Gene, String site1Pos, String site2Chrom, String site2Desc, String site2Gene, String site2Pos, String splitReadSupport, String svClassName, String svDesc, String svLength, String svVariantId, String tumorReadCount, String tumorVariantCount, String variantStatusName) {
+     * @param annotation
+     * @param breakpointType
+     * @param comments
+     * @param confidenceClass
+     * @param connType
+     * @param connectionType
+     * @param eventInfo
+     * @param mapq
+     * @param normalReadCount
+     * @param normalVariantCount
+     * @param pairedEndReadSupport
+     * @param site1Chrom
+     * @param site1Desc
+     * @param site1Exon
+     * @param site1Gene
+     * @param site1Pos
+     * @param site2Chrom
+     * @param site2Desc
+     * @param site2Exon
+     * @param site2Gene
+     * @param site2Pos
+     * @param splitReadSupport
+     * @param svClassName
+     * @param svDesc
+     * @param svLength
+     * @param svVariantId
+     * @param tumorReadCount
+     * @param variantStatusName
+     * @param tumorVariantCount
+     * @param gene1
+     * @param gene2
+     * @param exon1
+     * @param exon2
+     * @param sampleComment
+     * @param additionalProperties
+     */
+    public CVRSvVariant(String annotation, String breakpointType, String comments, String confidenceClass, String connType, String connectionType, String eventInfo, String mapq, String normalReadCount, String normalVariantCount, String pairedEndReadSupport, String site1Chrom, String site1Desc, String site1Exon, String site1Gene, String site1Pos, String site2Chrom, String site2Desc, String site2Exon, String site2Gene, String site2Pos, String splitReadSupport, String svClassName, String svDesc, String svLength, String svVariantId, String tumorReadCount, String variantStatusName, String tumorVariantCount, String gene1, String gene2, String exon1, String exon2, String sampleComment, Map<String, Object> additionalProperties) {
         this.annotation = annotation;
         this.breakpointType = breakpointType;
         this.comments = comments;
@@ -202,10 +215,12 @@ public class CVRSvVariant {
         this.pairedEndReadSupport = pairedEndReadSupport;
         this.site1Chrom = site1Chrom;
         this.site1Desc = site1Desc;
+        this.site1Exon = site1Exon;
         this.site1Gene = site1Gene;
         this.site1Pos = site1Pos;
         this.site2Chrom = site2Chrom;
         this.site2Desc = site2Desc;
+        this.site2Exon = site2Exon;
         this.site2Gene = site2Gene;
         this.site2Pos = site2Pos;
         this.splitReadSupport = splitReadSupport;
@@ -214,8 +229,14 @@ public class CVRSvVariant {
         this.svLength = svLength;
         this.svVariantId = svVariantId;
         this.tumorReadCount = tumorReadCount;
-        this.tumorVariantCount = tumorVariantCount;
         this.variantStatusName = variantStatusName;
+        this.tumorVariantCount = tumorVariantCount;
+        this.gene1 = gene1;
+        this.gene2 = gene2;
+        this.exon1 = exon1;
+        this.exon2 = exon2;
+        this.sampleComment = sampleComment;
+        this.additionalProperties = additionalProperties;
     }
 
     /**
@@ -479,6 +500,26 @@ public class CVRSvVariant {
     }
 
     /**
+     *
+     * @return
+     * The site1Exon
+     */
+    @JsonProperty("site1_exon")
+    public String getSite1_Exon() {
+        return site1Exon;
+    }
+
+    /**
+     *
+     * @param site1Exon
+     * The site1_exon
+     */
+    @JsonProperty("site1_exon")
+    public void setSite1_Exon(String site1Exon) {
+        this.site1Exon = site1Exon;
+    }
+
+    /**
     *
     * @return
     * The site1Gene
@@ -556,6 +597,26 @@ public class CVRSvVariant {
     @JsonProperty("site2_desc")
     public void setSite2_Desc(String site2Desc) {
         this.site2Desc = site2Desc;
+    }
+
+    /**
+     *
+     * @return
+     * The site2Exon
+     */
+    @JsonProperty("site2_exon")
+    public String getSite2_Exon() {
+        return site2Exon;
+    }
+
+    /**
+     *
+     * @param site2Exon
+     * The site2_exon
+     */
+    @JsonProperty("site2_exon")
+    public void setSite2_Exon(String site2Exon) {
+        this.site1Exon = site2Exon;
     }
 
     /**
