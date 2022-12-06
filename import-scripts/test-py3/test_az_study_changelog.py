@@ -89,6 +89,11 @@ class TestChangelog(unittest.TestCase):
         # Tests changelog output for clinical files that are newly added
         self.compare_expected_output_to_actual('new_files')
 
+    def test_cancer_type_changes(self):
+        self.compare_expected_output_to_actual(
+            'cancer_type_changes', expected_modified_sample_count=5
+        )
+
     def parse_git_line_tokens(self, git_path):
         git_lines = []
 

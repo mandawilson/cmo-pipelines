@@ -538,7 +538,7 @@ class Changelog:
             samples_for_cancer_type.discard(sample_id)
 
             # If any of the other samples associated with this patient + cancer type
-            # are not from cancer type changes, then the patient is not for this cancer type
+            # are not from cancer type changes, then the patient is not new for this cancer type
             for other_sample_id in samples_for_cancer_type:
                 if not self.sample_data_handler.cancer_type_changed(other_sample_id):
                     patient_is_new_for_cancer_type = False
