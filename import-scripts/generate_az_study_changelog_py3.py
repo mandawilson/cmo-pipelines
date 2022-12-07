@@ -13,12 +13,12 @@ This script requires that `pandas` and `GitPython` be installed within the
 Python environment you are running this script in.
 
 Usage:
-    python generate_az_study_changelog.py $DATA_REPO_PATH \
+    python3 generate_az_study_changelog_py3.py $DATA_REPO_PATH \
         --output-filename $OUTPUT_FILENAME \
         --output-dir $OUTPUT_DIR
 
 Example:
-    python generate_az_study_changelog.py /path/to/az-msk-impact-2022/
+    python3 generate_az_study_changelog_py3.py /path/to/az-msk-impact-2022/
 
 When `--output-filename` and `--output-dir` are not provided, the summary file
 is written to `$DATA_REPO_PATH/changelog_summary.txt` by default.
@@ -44,7 +44,7 @@ Sample output:
     ...
 
 Unit tests can be run with the following command:
-    python -m unittest discover
+    python -m unittest discover test-py3
 
 """
 
