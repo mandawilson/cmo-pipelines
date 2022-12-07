@@ -39,7 +39,7 @@ SKIP_DMP_IMPORT_BEFORE_HHMM=2000
     echo "executing update-msk-spectrum-cohort.sh"
     /data/portal-cron/scripts/update-msk-spectrum-cohort.sh
     date
-    echo "executing update-az-mskimpact.sh.sh"
+    echo "executing update-az-mskimpact.sh"
     /data/portal-cron/scripts/update-az-mskimpact.sh
     date
     echo "wrapper complete"
