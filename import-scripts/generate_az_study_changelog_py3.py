@@ -269,8 +269,8 @@ class SampleDataHandler(DataHandler):
         )
 
     def process_sample_data(self):
-        """Processes git diff output for the clinical patient file. Stores the patient IDs
-        of all patients that were added, deleted, or modified in the latest commit to the patient file.
+        """Processes git diff output for the clinical sample file. Stores the sample IDs
+        of all samples that were added, deleted, or modified in the latest change to the sample file.
         """
         self.populate_sample_set()
 
