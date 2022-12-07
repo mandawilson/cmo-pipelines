@@ -2,7 +2,7 @@
 
 To run the tests, execute the following command from the parent
 directory of this script:
-        python -m unittest discover 
+        python -m unittest discover test-py3
 """
 
 import unittest
