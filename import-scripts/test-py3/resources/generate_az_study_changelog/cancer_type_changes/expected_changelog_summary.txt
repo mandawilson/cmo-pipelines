@@ -1,4 +1,4 @@
-Summary changelog, 2022-12-06
+Summary changelog, 2022-12-08
 
 Total number of patients: 18
 New patients: 0
@@ -21,11 +21,11 @@ Ampullary Cancer
 	Deleted samples: 0
 
 Bladder Cancer
-	Total patients: 3
+	Total patients: 4
 	New patients: 1
 	Deleted patients: 0
 
-	Total samples: 3
+	Total samples: 4
 	New samples: 1
 		Sample type:
 			Primary: 1
@@ -47,7 +47,7 @@ Bone Cancer
 Breast Cancer
 	Total patients: 1
 	New patients: 0
-	Deleted patients: 2
+	Deleted patients: 1
 
 	Total samples: 1
 	New samples: 0
@@ -79,10 +79,10 @@ Hepatobiliary Cancer
 
 Lung Adenocarcinoma
 	Total patients: 1
-	New patients: 0
+	New patients: 1
 	Deleted patients: 0
 
-	Total samples: 2
+	Total samples: 1
 	New samples: 1
 		Sample type:
 			Primary: 1
@@ -93,20 +93,20 @@ Lung Adenocarcinoma
 	Deleted samples: 0
 
 Mesothelioma
-	Total patients: 6
+	Total patients: 7
 	New patients: 0
 	Deleted patients: 1
 
-	Total samples: 6
+	Total samples: 7
 	New samples: 0
 	Deleted samples: 1
 
 Non-Small Cell Lung Cancer
-	Total patients: 4
+	Total patients: 3
 	New patients: 1
 	Deleted patients: 0
 
-	Total samples: 4
+	Total samples: 3
 	New samples: 1
 		Sample type:
 			Metastasis: 1
