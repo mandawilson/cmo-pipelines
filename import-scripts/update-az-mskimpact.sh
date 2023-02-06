@@ -62,8 +62,8 @@ function transfer_to_az_sftp_server() {
     # Connect and transfer data
     # With use of here-doc, there must be no leading whitespace until EOF
     sftp -i "$TRANSFER_KEY" "$SFTP_USER"@"$SERVICE_ENDPOINT" -b <<EOF
-put -R "$AZ_DATA_HOME/az_mskimpact" "$AZ_REPO_NAME/az_mskimpact"
-put -R "$AZ_DATA_HOME/gene_panels" "$AZ_REPO_NAME/gene_panels"
+put -R "$AZ_DATA_HOME/az_mskimpact" "$AZ_REPO_NAME"
+put -R "$AZ_DATA_HOME/gene_panels" "$AZ_REPO_NAME"
 put "$AZ_DATA_HOME/README.md" "$AZ_REPO_NAME"
 exit
 EOF
