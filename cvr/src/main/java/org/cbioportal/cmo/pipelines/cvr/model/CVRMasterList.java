@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Memorial Sloan-Kettering Cancer Center.
+ * Copyright (c) 2017, 2024 Memorial Sloan-Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jakarta.annotation.Generated;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
@@ -141,11 +140,6 @@ public class CVRMasterList {
     @JsonProperty("total")
     public void setSampleCount(Integer sampleCount) {
         this.sampleCount = sampleCount;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 
     @JsonAnyGetter
