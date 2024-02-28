@@ -85,8 +85,8 @@ public class Skcm_mskcc_2015_chantTimelineWriter implements ItemStreamWriter<Str
     }
 
     @Override
-    public void write(List<? extends String> items) throws Exception {
-        List<String> writeList = new ArrayList<>();
+    public void write(Chunk<? extends String> items) throws Exception {
+        Chunk<String> writeList = new Chunk<>();
         for (String result : items) {
             if (!Strings.isNullOrEmpty(result)) {
                 writeList.add(result);

@@ -54,7 +54,7 @@ public class MskimpactAgeWriter implements ItemStreamWriter<MskimpactCompositeDe
     private String datasetFilename;
 
     private int recordsWritten;
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
     private File stagingFile;
 
@@ -85,7 +85,7 @@ public class MskimpactAgeWriter implements ItemStreamWriter<MskimpactCompositeDe
     }
 
     @Override
-    public void write(List<? extends MskimpactCompositeDemographics> items) throws Exception {
+    public void write(Chunk<? extends MskimpactCompositeDemographics> items) throws Exception {
         writeList.clear();
         for (MskimpactCompositeDemographics record : items) {
             if (!Strings.isNullOrEmpty(record.getAgeResult())) {

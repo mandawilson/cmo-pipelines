@@ -56,7 +56,7 @@ public class MskimpactMedicalTherapyClinicalWriter implements ItemStreamWriter<M
     private File stagingFile;
 
     private int recordsWritten;
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
 
     @Override
@@ -86,7 +86,7 @@ public class MskimpactMedicalTherapyClinicalWriter implements ItemStreamWriter<M
     }
 
     @Override
-    public void write(List<? extends MskimpactMedicalTherapy> items) throws Exception{
+    public void write(Chunk<? extends MskimpactMedicalTherapy> items) throws Exception{
         writeList.clear();
         for (MskimpactMedicalTherapy item : items) {
             if (!Strings.isNullOrEmpty(item.getDMP_ID_PHARMACY())) {

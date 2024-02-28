@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.log4j.Logger;
 import java.util.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import static com.querydsl.core.alias.Alias.$;
 import static com.querydsl.core.alias.Alias.alias;
 import java.util.regex.Matcher;

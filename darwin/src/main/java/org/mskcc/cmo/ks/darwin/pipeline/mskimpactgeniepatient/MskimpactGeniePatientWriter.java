@@ -54,7 +54,7 @@ public class MskimpactGeniePatientWriter implements ItemStreamWriter<String>{
     private String datasetFilename;
 
     private int recordsWritten;
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
     private File stagingFile;
 
@@ -85,7 +85,7 @@ public class MskimpactGeniePatientWriter implements ItemStreamWriter<String>{
     }
 
     @Override
-    public void write(List<? extends String> list) throws Exception {
+    public void write(Chunk<? extends String> list) throws Exception {
         writeList.clear();
         for (String record : list) {
             if (!Strings.isNullOrEmpty(record)) {

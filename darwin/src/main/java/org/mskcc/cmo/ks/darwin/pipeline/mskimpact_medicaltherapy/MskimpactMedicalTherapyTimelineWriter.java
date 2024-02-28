@@ -54,7 +54,7 @@ public class MskimpactMedicalTherapyTimelineWriter implements ItemStreamWriter<M
 
     private String stagingFile;
 
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
 
     @Override
@@ -81,7 +81,7 @@ public class MskimpactMedicalTherapyTimelineWriter implements ItemStreamWriter<M
     }
 
     @Override
-    public void write(List<? extends MskimpactMedicalTherapy> items) throws Exception {
+    public void write(Chunk<? extends MskimpactMedicalTherapy> items) throws Exception {
         // TBD: figure out why we cannot pass items to FlatFileItemWriter directly
         writeList.clear();
          for (MskimpactMedicalTherapy item : items) {

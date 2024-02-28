@@ -60,7 +60,7 @@ public class MskimpactTimelineBrainSpineWriter implements ItemStreamWriter<Mskim
     private String outputDirectory;
 
     private int recordsWritten;
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private final FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
     private File stagingFile;
 
@@ -98,7 +98,7 @@ public class MskimpactTimelineBrainSpineWriter implements ItemStreamWriter<Mskim
     }
 
     @Override
-    public void write(List<? extends MskimpactBrainSpineCompositeTimeline> items) throws Exception{
+    public void write(Chunk<? extends MskimpactBrainSpineCompositeTimeline> items) throws Exception{
         writeList.clear();
         for (MskimpactBrainSpineCompositeTimeline result : items) {
             String record = (String) result.getClass().getMethod("get" + type.toString() + "Result").invoke(result);

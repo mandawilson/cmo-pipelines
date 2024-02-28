@@ -59,7 +59,7 @@ public class MskimpactPatientDemographicsWriter implements ItemStreamWriter<Mski
 
     private final double DEMOGRAPHIC_RECORD_DROP_THRESHOLD = 0.9;
     private int recordsWritten;
-    private List<String> writeList = new ArrayList<>();
+    private Chunk<String> writeList = new Chunk<>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<>();
     private File stagingFile;
 
@@ -92,7 +92,7 @@ public class MskimpactPatientDemographicsWriter implements ItemStreamWriter<Mski
     }
 
     @Override
-    public void write(List<? extends MskimpactCompositeDemographics> items) throws Exception{
+    public void write(Chunk<? extends MskimpactCompositeDemographics> items) throws Exception{
         writeList.clear();
         for(MskimpactCompositeDemographics record : items){
             if (!Strings.isNullOrEmpty(record.getDemographicsResult())) {

@@ -92,8 +92,8 @@ public class Skcm_mskcc_2015_chantClinicalPatientWriter implements ItemStreamWri
     }
 
     @Override
-    public void write(List<? extends Skcm_mskcc_2015_chantClinicalCompositeRecord> items) throws Exception {
-        List<String> writeList = new ArrayList<>();
+    public void write(Chunk<? extends Skcm_mskcc_2015_chantClinicalCompositeRecord> items) throws Exception {
+        Chunk<String> writeList = new Chunk<>();
         for (Skcm_mskcc_2015_chantClinicalCompositeRecord result : items) {
             if (!Strings.isNullOrEmpty(result.getPatientRecord())) {
                 writeList.add(result.getPatientRecord());

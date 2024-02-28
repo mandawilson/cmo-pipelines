@@ -33,8 +33,8 @@
 package org.cbioportal.cmo.pipelines.cvr.model;
 
 import com.fasterxml.jackson.annotation.*;
+import jakarta.annotation.Generated;
 import java.util.*;
-import javax.annotation.Generated;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**

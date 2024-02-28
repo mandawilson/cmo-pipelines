@@ -49,7 +49,6 @@ public class GDDResultWriter implements ItemStreamWriter<String>
     private String stagingFile;
 
     //private Resource resource;
-    private List<String> writeList = new ArrayList<String>();
     private FlatFileItemWriter<String> flatFileItemWriter = new FlatFileItemWriter<String>();
         
     @Override
@@ -77,13 +76,8 @@ public class GDDResultWriter implements ItemStreamWriter<String>
     }
 
     @Override
-    public void write(List<? extends String> items) throws Exception
+    public void write(Chunk<? extends String> items) throws Exception
     {
-        writeList.clear();
-        List<String> writeList = new ArrayList<String>();
-        for (String result : items) {
-            writeList.add(result);
-        }
-        flatFileItemWriter.write(writeList);
+        flatFileItemWriter.write(items);
     }
 }

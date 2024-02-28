@@ -50,7 +50,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Code reads information out of DVCBIO.PHARMACY_V looking

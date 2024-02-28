@@ -15,7 +15,6 @@
     <module>darwin</module>
     <module>redcap</module>
     <module>cvr</module>
-    <module>gene</module>
     <module>ddp</module>
     <module>import-scripts</module>
   </modules>
@@ -24,12 +23,12 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.18</version>
+    <version>3.1.4</version>
   </parent>
 
   <properties>
-    <spring.version>5.3.31</spring.version>
-    <jackson.version>2.11.2</jackson.version>
+    <spring.version>6.0.12</spring.version>
+    <jackson.version>2.14.3</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
     <maven.compiler.version>3.11.0</maven.compiler.version>
     <maven.compiler.java.source>21</maven.compiler.java.source>
