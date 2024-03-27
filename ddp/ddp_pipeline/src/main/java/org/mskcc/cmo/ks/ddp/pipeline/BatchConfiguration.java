@@ -104,6 +104,7 @@ public class BatchConfiguration {
         return threadPoolTaskExecutor;
     }
 
+    @Bean
     @StepScope
     public ItemProcessor<DDPCompositeRecord, Future<CompositeResult>> asyncItemProcessor() {
         AsyncItemProcessor<DDPCompositeRecord, CompositeResult> asyncItemProcessor = new AsyncItemProcessor<>();
