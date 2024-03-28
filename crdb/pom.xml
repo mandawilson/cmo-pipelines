@@ -83,8 +83,8 @@
       <type>pom</type>
       <exclusions>
         <exclusion>
-      	  <groupId>com.oracle.database.ha</groupId>
-      	  <artifactId>simplefan</artifactId>
+          <groupId>com.oracle.database.ha</groupId>
+          <artifactId>simplefan</artifactId>
         </exclusion>
         <exclusion>
           <groupId>com.oracle.database.ha</groupId>
