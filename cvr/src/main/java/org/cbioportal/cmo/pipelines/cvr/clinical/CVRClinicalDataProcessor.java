@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, 2023 Memorial Sloan Kettering Cancer Center.
+ * Copyright (c) 2016, 2017, 2023, 2025 Memorial Sloan Kettering Cancer Center.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
@@ -65,7 +65,7 @@ public class CVRClinicalDataProcessor implements ItemProcessor<CVRClinicalRecord
             try {
                 record.add(cvrUtilitiess.convertWhitespace(i.getClass().getMethod("get" + field).invoke(i).toString().trim()));
             } catch (NullPointerException e) {
-                log.error("Null pointer expection: " + field);
+                log.error("Null pointer exception: " + field);
                 record.add("");
             }
         }
