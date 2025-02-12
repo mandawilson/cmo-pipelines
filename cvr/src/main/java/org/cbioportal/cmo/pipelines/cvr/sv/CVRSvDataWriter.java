@@ -93,11 +93,8 @@ public class CVRSvDataWriter implements ItemStreamWriter<CompositeSvRecord> {
     public void write(Chunk<? extends CompositeSvRecord> items) throws Exception {
         Chunk<String> writeList = new Chunk<>();
         for (CompositeSvRecord item : items) {
-            if (item.getNewSvRecord() != null) {
-                writeList.add(item.getNewSvRecord());
-            } else {
-                writeList.add(item.getOldSvRecord());
-            }
+	    String recordToAdd = (item.getNewSvRecord() != null) ? item.getNewSvRecord() : item.getOldSvRecord();
+            writeList.add(recordToAdd);
         }
         flatFileItemWriter.write(writeList);
     }

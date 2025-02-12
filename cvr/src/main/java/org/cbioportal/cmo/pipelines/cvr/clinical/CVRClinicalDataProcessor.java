@@ -65,7 +65,7 @@ public class CVRClinicalDataProcessor implements ItemProcessor<CVRClinicalRecord
             try {
                 record.add(cvrUtilitiess.convertWhitespace(i.getClass().getMethod("get" + field).invoke(i).toString().trim()));
             } catch (NullPointerException e) {
-                log.error("Null pointer expection: " + field);
+                log.error("Null pointer exception: " + field);
                 record.add("");
             }
         }

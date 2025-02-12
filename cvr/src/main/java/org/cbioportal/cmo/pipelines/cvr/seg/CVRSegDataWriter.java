@@ -90,11 +90,8 @@ public class CVRSegDataWriter implements ItemStreamWriter<CompositeSegRecord> {
     public void write(Chunk<? extends CompositeSegRecord> items) throws Exception {
         Chunk<String> writeList = new Chunk<>();
         for (CompositeSegRecord item : items) {
-            if (item.getNewSegRecord() != null) {
-                writeList.add(item.getNewSegRecord());
-            } else {
-                writeList.add(item.getOldSegRecord());
-            }
+	    String recordToAdd = (item.getNewSegRecord() != null) ? item.getNewSegRecord() : item.getOldSegRecord();
+            writeList.add(recordToAdd);
         }
         flatFileItemWriter.write(writeList);
     }
