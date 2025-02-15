@@ -49,10 +49,11 @@ public class CVRMutationFieldSetMapper implements FieldSetMapper<MutationRecord>
     @Override
     public MutationRecord mapFieldSet(FieldSet fs) throws BindException {
         MutationRecord record = new MutationRecord();
-        Set<String> names = new HashSet<>(Arrays.asList(fs.getNames()));
+        String[] names = fs.getNames();
 
-        for (String field : names) {
-            String value = fs.readRawString(field);
+        for (int i = 0; i < names.length; i++) {
+            String field = names[i];
+            String value = (i < fs.getFieldCount()) ? fs.readRawString(i) : "";  // Default to empty string if out of bounds
             if (value == null) continue;
             setFieldValue(record, field, value);
         }
