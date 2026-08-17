@@ -2,6 +2,8 @@
 set -euo pipefail
 
 PIPELINE_PARAM=""
+RESULT_STATE_CHECK_MAX_ATTEMPTS=5
+RESULT_STATE_CHECK_PAUSE_SECONDS=5
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -69,7 +71,29 @@ while true; do
     echo "Job state: $LIFE_CYCLE_STATE"
 
     if [ "$LIFE_CYCLE_STATE" == "TERMINATED" ] || [ "$LIFE_CYCLE_STATE" == "SKIPPED" ] || [ "$LIFE_CYCLE_STATE" == "INTERNAL_ERROR" ]; then
-        RESULT_STATE=$(python3 -c "import json; print(json.load(open('/tmp/databricks_run_status.json'))['state']['result_state'])")
+        # result_state can lag behind life_cycle_state reaching TERMINATED
+        # (e.g. multi-task jobs), so retry briefly instead of failing immediately.
+        RESULT_STATE=""
+        result_state_check_count=0
+        while [ $result_state_check_count -lt $RESULT_STATE_CHECK_MAX_ATTEMPTS ]; do
+            RESULT_STATE=$(python3 -c "import json; print(json.load(open('/tmp/databricks_run_status.json'))['state'].get('result_state', ''))")
+            if [ -n "$RESULT_STATE" ]; then
+                break
+            fi
+            sleep $RESULT_STATE_CHECK_PAUSE_SECONDS
+            curl -s -o /tmp/databricks_run_status.json \
+                -X GET \
+                -H "Authorization: Bearer $DATABRICKS_TOKEN" \
+                "https://$DATABRICKS_SERVER_HOSTNAME/api/2.1/jobs/runs/get?run_id=$RUN_ID"
+            result_state_check_count=$(($result_state_check_count+1))
+        done
+
+        if [ -z "$RESULT_STATE" ]; then
+            echo "Error: Databricks job reached life_cycle_state=$LIFE_CYCLE_STATE but result_state was not available after $RESULT_STATE_CHECK_MAX_ATTEMPTS attempts with a period of $RESULT_STATE_CHECK_PAUSE_SECONDS seconds. Exiting" >&2
+            cat /tmp/databricks_run_status.json
+            exit 1
+        fi
+
         echo "Job finished with result: $RESULT_STATE"
         if [ "$RESULT_STATE" != "SUCCESS" ]; then
             echo "Databricks job failed. Check the Databricks UI for details."
