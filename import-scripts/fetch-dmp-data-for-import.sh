@@ -35,8 +35,9 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         local merged_clinical_file="$study_data_home/data_clinical_patient_merged.txt"
 
         if [ -n "$s3_prefix" ]; then
-            # Re-fetch clinical patient supplements fresh from S3 before merging.
-            # Files are deleted locally after each successful merge.
+            # Re-fetch biobank/biofluid clinical patient supplements fresh from S3 before merging.
+            # Files are deleted locally after each successful merge and must be
+            # retrieved each run rather than relying on them surviving in S3 overnight.
             # touch creates the file so try_download_from_s3 can accept a file path;
             # the -s check ensures we clean up if S3 had no file to download.
             touch "$biobank_clinical_file"
