@@ -19,10 +19,12 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
     #
     # Args:
     #   $1  study_data_home  Local directory for the study.
-    #   $2  s3_prefix        Optional. If provided, biobank/biofluid clinical patient files
-    #                        are fetched fresh from S3 at this prefix (e.g. "msk_solid_heme")
-    #                        before merging. Use when files are written externally (e.g. Databricks)
-    #                        and deleted locally after each successful merge.
+    #   $2  s3_prefix        Optional. If provided, biobank/biofluid clinical (and timeline)
+    #                        files are fetched fresh from S3 at this prefix before merging.
+    #                        Must match the local study directory basename (S3 download suffix
+    #                        check), e.g. "msk_solid_heme". Use when files are
+    #                        written externally (e.g. Databricks) and clinical supplements are
+    #                        deleted locally after each successful merge.
     function merge_biobank_clinical_data() {
         local study_data_home="$1"
         local s3_prefix="$2"
@@ -35,25 +37,26 @@ MY_FLOCK_FILEPATH="/data/portal-cron/cron-lock/fetch-dmp-data-for-import.lock"
         local merged_clinical_file="$study_data_home/data_clinical_patient_merged.txt"
 
         if [ -n "$s3_prefix" ]; then
-            # Re-fetch biobank/biofluid clinical patient supplements fresh from S3 before merging.
-            # Files are deleted locally after each successful merge and must be
-            # retrieved each run rather than relying on them surviving in S3 overnight.
+            # Re-fetch Databricks supplements. Clinical files are deleted after merge;
+            # timeline files stay in the study dir for CDM/portal import. Study merge/subset
+            # wipes the dest dir, so these must be pulled after that step.
             # touch creates the file so try_download_from_s3 can accept a file path;
             # the -s check ensures we clean up if S3 had no file to download.
-            touch "$biobank_clinical_file"
-            if ! try_download_from_s3 "$biobank_clinical_file" \
-                    "${s3_prefix}/data_clinical_patient_biobank.txt" "mskimpact-databricks" \
-                || [ ! -s "$biobank_clinical_file" ] ; then
-                rm -f "$biobank_clinical_file"
-                echo "`date`: Warning: could not fetch biobank clinical patient file from S3 for ${study_data_home}; biobank merge will be skipped."
-            fi
-            touch "$biofluid_clinical_file"
-            if ! try_download_from_s3 "$biofluid_clinical_file" \
-                    "${s3_prefix}/data_clinical_patient_biofluid.txt" "mskimpact-databricks" \
-                || [ ! -s "$biofluid_clinical_file" ] ; then
-                rm -f "$biofluid_clinical_file"
-                echo "`date`: Warning: could not fetch biofluid clinical patient file from S3 for ${study_data_home}; biofluid merge will be skipped."
-            fi
+            fetch_s3_supplement() {
+                local dest="$1"
+                local s3_key="$2"
+                local label="$3"
+                touch "$dest"
+                if ! try_download_from_s3 "$dest" "$s3_key" "mskimpact-databricks" \
+                    || [ ! -s "$dest" ] ; then
+                    rm -f "$dest"
+                    echo "`date`: Warning: could not fetch ${label} from S3 for ${study_data_home}; ${label} will be skipped."
+                fi
+            }
+            fetch_s3_supplement "$biobank_clinical_file" "${s3_prefix}/data_clinical_patient_biobank.txt" "biobank clinical patient file"
+            fetch_s3_supplement "$biofluid_clinical_file" "${s3_prefix}/data_clinical_patient_biofluid.txt" "biofluid clinical patient file"
+            fetch_s3_supplement "$biobank_timeline_file" "${s3_prefix}/data_timeline_biobank_specimen.txt" "biobank timeline file"
+            fetch_s3_supplement "$biofluid_timeline_file" "${s3_prefix}/data_timeline_biofluid_specimen.txt" "biofluid timeline file"
         fi
 
         merge_clinical_supplement() {
